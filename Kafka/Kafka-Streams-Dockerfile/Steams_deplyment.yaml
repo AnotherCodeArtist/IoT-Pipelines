@@ -1,0 +1,24 @@
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: streams-deployment
+spec:
+  selector:
+    matchLabels:
+      app: streams
+  replicas: 1 # tells deployment to run 2 pods matching the template
+  template:
+    metadata:
+      labels:
+        app: streams
+    spec:
+      containers:
+      - name: streams
+        image: gzei/streamtest:latest
+        env:
+        - name: "KAFKA_BROKER_LIST"
+          value: "172.17.100.41:31090"
+        - name: "INPUT_TOPIC"
+          value: "winput"
+        - name: "OUTPUT_TOPIC"
+          value: "woutput"
