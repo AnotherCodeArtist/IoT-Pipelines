@@ -46,7 +46,7 @@ public class kafkatest {
             }
             //Da drinnen kann ma die sachen machen die ma will....
             System.out.println(jsonObject.get("temperature").toString());
-            jsonObject.put("temperatureF",(long)jsonObject.get("temperature")*(1.8)+ 32);
+            jsonObject.put("temperatureF",(double)jsonObject.get("temperature")*(1.8)+ 32);
             tmp.add(new KeyValue(k, jsonObject.toJSONString()));
             return tmp;
         }).to(System.getenv("OUTPUT_TOPIC"));
