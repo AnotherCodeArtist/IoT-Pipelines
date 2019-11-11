@@ -109,7 +109,7 @@ public class StreamingJob {
 		);
 
 		//Sinking the Data Stream to InfluxDB
-		InfluxDBConfig influxDBConfig = InfluxDBConfig.builder("http://influxdb.influxdb:8086", "admin", "", "mqtt")
+		InfluxDBConfig influxDBConfig = InfluxDBConfig.builder("http://influxdb.influxdb:8086", "admin", "Pa55w.rd", "mqtt")
 				.batchActions(1000)
 				.flushDuration(100, TimeUnit.MILLISECONDS)
 				.enableGzip(true)
