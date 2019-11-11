@@ -1,0 +1,79 @@
+//SinkingJob
+mvn archetype:generate
+-DarchetypeGroupId=org.apache.flink
+-DarchetypeArtifactId=flink-quickstart-java
+-DarchetypeVersion=1.9.1
+-DgroupId=BUEPA.RTIP.MQTT.StreamingJobs
+-DartifactId=SinkingJob
+-Dversion=1.00
+-Dpackage=BUEPA.RTIP.MQTT.StreamingJobs
+-DinteractiveMode=false
+
+mvn archetype:generate -DarchetypeGroupId=org.apache.flink -DarchetypeArtifactId=flink-quickstart-java -DarchetypeVersion=1.9.1 -DgroupId=BUEPA.RTIP.MQTT.StreamingJobs -DartifactId=SinkingJob -Dversion=1.11 -Dpackage=BUEPA.RTIP.MQTT.StreamingJobs -DinteractiveMode=false
+
+//InfluxDBSinkingJob
+mvn archetype:generate
+-DarchetypeGroupId=org.apache.flink
+-DarchetypeArtifactId=flink-quickstart-java
+-DarchetypeVersion=1.9.1
+-DgroupId=BUEPA.RTIP.MQTT.StreamingJobs
+-DartifactId=InfluxDBSinkingJob
+-Dversion=1.00
+-Dpackage=BUEPA.RTIP.MQTT.StreamingJobs
+-DinteractiveMode=false
+
+mvn archetype:generate -DarchetypeGroupId=org.apache.flink -DarchetypeArtifactId=flink-quickstart-java -DarchetypeVersion=1.9.1 -DgroupId=BUEPA.RTIP.MQTT.StreamingJobs -DartifactId=InfluxDBSinkingJob -Dversion=1.1 -Dpackage=BUEPA.RTIP.MQTT.StreamingJobs -DinteractiveMode=false
+
+//CrateDBSinkingJob
+mvn archetype:generate
+-DarchetypeGroupId=org.apache.flink
+-DarchetypeArtifactId=flink-quickstart-java
+-DarchetypeVersion=1.9.1
+-DgroupId=BUEPA.RTIP.MQTT.StreamingJobs
+-DartifactId=CrateDBSinkingJob
+-Dversion=1.00
+-Dpackage=BUEPA.RTIP.MQTT.StreamingJobs
+-DinteractiveMode=false
+
+mvn archetype:generate -DarchetypeGroupId=org.apache.flink -DarchetypeArtifactId=flink-quickstart-java -DarchetypeVersion=1.9.1 -DgroupId=BUEPA.RTIP.MQTT.StreamingJobs -DartifactId=CrateDBSinkingJob -Dversion=1.01 -Dpackage=BUEPA.RTIP.MQTT.StreamingJobs -DinteractiveMode=false
+
+//OpenTSDBSinkingJob
+mvn archetype:generate
+-DarchetypeGroupId=org.apache.flink
+-DarchetypeArtifactId=flink-quickstart-java
+-DarchetypeVersion=1.9.1
+-DgroupId=BUEPA.RTIP.MQTT.StreamingJobs
+-DartifactId=OpenTSDBSinkingJob
+-Dversion=1.00
+-Dpackage=BUEPA.RTIP.MQTT.StreamingJobs
+-DinteractiveMode=false
+
+mvn archetype:generate -DarchetypeGroupId=org.apache.flink -DarchetypeArtifactId=flink-quickstart-java -DarchetypeVersion=1.9.1 -DgroupId=BUEPA.RTIP.MQTT.StreamingJobs -DartifactId=OpenTSDBSinkingJob -Dversion=1.01 -Dpackage=BUEPA.RTIP.MQTT.StreamingJobs -DinteractiveMode=false
+
+
+//TransformationJob
+mvn archetype:generate
+-DarchetypeGroupId=org.apache.flink
+-DarchetypeArtifactId=flink-quickstart-java
+-DarchetypeVersion=1.9.1
+-DgroupId=BUEPA.RTIP.MQTT.StreamingJobs
+-DartifactId=TransformationJob
+-Dversion=1.11
+-Dpackage=BUEPA.RTIP.MQTT.StreamingJobs
+-DinteractiveMode=false
+
+mvn archetype:generate -DarchetypeGroupId=org.apache.flink -DarchetypeArtifactId=flink-quickstart-java -DarchetypeVersion=1.9.1 -DgroupId=BUEPA.RTIP.MQTT.StreamingJobs -DartifactId=TransformationJob -Dversion=1.11 -Dpackage=BUEPA.RTIP.MQTT.StreamingJobs -DinteractiveMode=false
+
+
+//DetectionJob
+mvn archetype:generate
+-DarchetypeGroupId=org.apache.flink
+-DarchetypeArtifactId=flink-quickstart-java
+-DarchetypeVersion=1.9.1
+-DgroupId=BUEPA.RTIP.MQTT.StreamingJobs
+-DartifactId=DetectionJob
+-Dversion=1.00
+-Dpackage=BUEPA.RTIP.MQTT.StreamingJobs
+-DinteractiveMode=false
+
+mvn archetype:generate -DarchetypeGroupId=org.apache.flink -DarchetypeArtifactId=flink-quickstart-java -DarchetypeVersion=1.9.1 -DgroupId=BUEPA.RTIP.MQTT.StreamingJobs -DartifactId=DetectionJob -Dversion=1.00 -Dpackage=BUEPA.RTIP.MQTT.StreamingJobs -DinteractiveMode=false
