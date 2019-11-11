@@ -61,7 +61,7 @@ public class StreamingJob {
 		final DataStream<String> stream = env
 				.addSource(new RMQSource<String>(
 						connectionConfig,            						// config for the RabbitMQ connection
-						"graz.sensors.mqtt.pm2.sinking",        	// name of the RabbitMQ queue to consume
+						"graz.sensors.mqtt.pm2.influxdbsinking",        	// name of the RabbitMQ queue to consume
 						false,                        		// use correlation ids; can be false if only at-least-once is required
 						new SimpleStringSchema()))   						// deserialization schema to turn messages into Java objects
 				.setParallelism(1);             							// non-parallel Source
@@ -119,7 +119,7 @@ public class StreamingJob {
 
 
 		// execute program
-		env.execute("MQTT Sinking StreamingJob");
+		env.execute("MQTT InfluxDBSinking StreamingJob");
 
 	}
 }

@@ -21,8 +21,8 @@ under the License.
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>BUEPA.RTIP.MQTT.StreamingJobs</groupId>
-	<artifactId>SinkingJob</artifactId>
-	<version>1.11</version>
+	<artifactId>InfluxDBSinkingJob</artifactId>
+	<version>1.15</version>
 	<packaging>jar</packaging>
 
 	<name>Flink Quickstart Job</name>
