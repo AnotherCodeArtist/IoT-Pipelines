@@ -1,18 +1,7 @@
-//PM2,5 V1
+//PM2,5 MQTT Request
 
 {
-  "id":1,
-  "pm2":120,
-  "timestamp":1572727
-}
-
-//WholeRequest_V1
-{
-  "id":1,
-  "longitude":128,
-  "latitude":128,
-  "temperature":10,
-  "humidity":60,
-  "pm2":120,
-  "timestamp":1572727
+"id":1,
+"pm2":10,
+"ts":11122019201033
 }

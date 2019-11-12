@@ -50,7 +50,7 @@ public class StreamingJob {
 		final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
 		final RMQConnectionConfig connectionConfig = new RMQConnectionConfig.Builder()
-				.setHost("rabbitmq-service.mqtt.svc.cluster.local")
+				.setHost("rmq-cluster-rabbitmq-ha.mqtt.svc.cluster.local")
 				.setPort(5672)
 				.setUserName("guest")
 				.setPassword("Pa55w.rd")
@@ -80,7 +80,7 @@ public class StreamingJob {
 						String id = sensorID.split(":")[1];
 
 						// Extract the particulate matter
-						String sensorPM2 = input[5];
+						String sensorPM2 = input[1];
 						String pm2 = sensorPM2.split(":")[1];
 
 						// Extract the timestamp
@@ -103,7 +103,7 @@ public class StreamingJob {
 						HashMap<String, Object> fields = new HashMap<>();
 						fields.put("pm2", pm2);
 
-						return new InfluxDBPoint("PM2", timestamp, tags, fields);
+						return new InfluxDBPoint("PM2,5", timestamp, tags, fields);
 					}
 				}
 		);
