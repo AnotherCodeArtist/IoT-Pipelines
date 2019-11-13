@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: opentsdb
+  namespace: opentsdb       
+  labels:
+    app: opentsdb 
+spec:
+  type: NodePort
+  ports:
+    - port: 4242
+  selector:
+    app: opentsdb 
+    tier: opentsdb
+#  clusterIP: None
