@@ -84,3 +84,7 @@
       user: rkeuser
       state: present
       key: "{{ lookup('file', '/home/gze/.ssh/id_rsa.pub') }}"
+  - name: Install iptables-persistent
+    apt:
+      pkg:
+      - iptables-persistent
