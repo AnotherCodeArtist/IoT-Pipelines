@@ -1,0 +1,85 @@
+---
+- hosts: docker
+  become: yes
+  tasks:
+  - name: Upgrade all packages to the latest version
+    apt:
+      name: "*"
+      state: latest
+  - name: Install necessary packages
+    apt:
+      update_cache: yes
+      pkg:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg2
+      - software-properties-common
+      - haveged
+  - name: enable and start haveged
+    systemd:
+     name: haveged
+     enabled: yes
+     state: started
+  - name: Add Docker repo key
+    apt_key:
+      url: https://download.docker.com/linux/debian/gpg
+      state: present
+  - apt_repository:
+      repo: deb [arch=amd64] https://download.docker.com/linux/debian buster stable
+      state: present
+  - name: Install Docker
+    apt:
+      update_cache: yes
+      pkg:
+      - docker-ce
+    register: docker
+  - name: enable and start Docker
+    systemd:
+      name: docker
+      enabled: yes
+      state: started
+    ## https://germaniumhq.com/2019/02/14/2019-02-14-Disabling-Swap-for-Kubernetes-in-an-Ansible-Playbook/ see comments for modification
+  - name: Disable SWAP since kubernetes can't work with swap enabled (1/2)
+    shell: swapoff -a
+  - name: Disable SWAP in fstab since kubernetes can't work with swap enabled (2/2)
+    replace:
+      path: /etc/fstab
+      regexp: '^[^#](.+?\sswap\s+sw\s+.*)$'
+      replace: '# \1'
+  - name: Enable Kernel modules needed
+    shell: for module in br_netfilter ip6_udp_tunnel ip_set ip_set_hash_ip ip_set_hash_net iptable_filter iptable_nat iptable_mangle iptable_raw nf_conntrack_netlink nf_conntrack nf_conntrack_ipv4 nf_defrag_ipv4 nf_nat nf_nat_ipv4 nf_nat_masquerade_ipv4 nfnetlink udp_tunnel veth vxlan x_tables xt_addrtype xt_conntrack xt_comment xt_mark xt_multiport xt_nat xt_recent xt_set xt_statistic xt_tcpudp; do if ! lsmod | grep -q $module; then modprobe $module; fi; done
+  - name: Enable nf call iptables
+    sysctl:
+      name: net.bridge.bridge-nf-call-iptables
+      value: '1'
+      sysctl_set: yes
+      state: present
+      reload: yes
+  - name: Change chain "FORWARD" default to ACCEPT
+    iptables:
+      chain: FORWARD
+      jump: ACCEPT
+  - name: Enable AllowTcpForwarding for SSHd
+    lineinfile:
+      path: /etc/ssh/sshd_config
+      state: present
+      regexp: '^AllowTcpForwarding'
+      line: "AllowTcpForwarding yes"
+    register: ssh
+  - name: Restart SSHd
+    systemd:
+      name: sshd
+      state: restarted
+    when: ssh.changed
+  - name: adduser rkeuser
+    user:
+      name: rkeuser
+      shell: /bin/bash
+      groups: docker
+      append: yes
+  - name: Set authorized key taken from file
+    authorized_key:
+      user: rkeuser
+      state: present
+      key: "{{ lookup('file', '/home/gze/.ssh/id_rsa.pub') }}"
