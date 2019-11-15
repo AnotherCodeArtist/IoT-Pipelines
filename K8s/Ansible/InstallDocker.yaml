@@ -16,6 +16,7 @@
       - gnupg2
       - software-properties-common
       - haveged
+      - nfs-common
   - name: enable and start haveged
     systemd:
      name: haveged
