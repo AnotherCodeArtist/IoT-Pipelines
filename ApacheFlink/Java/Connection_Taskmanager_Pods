@@ -1,0 +1,7 @@
+
+//Getting a shell to the Flink Taskmanagers
+kubectl exec -it flink-taskmanager-bd7f8ccd7-22whv -n flink -- /bin/bash
+kubectl exec -it flink-taskmanager-bd7f8ccd7-ftftx -n flink -- /bin/bash
+cd /
+cd tmp
+head alarm.txt

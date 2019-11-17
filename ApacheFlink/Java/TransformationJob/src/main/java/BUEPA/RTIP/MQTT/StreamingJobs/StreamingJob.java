@@ -19,6 +19,7 @@
 package BUEPA.RTIP.MQTT.StreamingJobs;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
+import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.influxdb.InfluxDBConfig;
@@ -26,7 +27,6 @@ import org.apache.flink.streaming.connectors.influxdb.InfluxDBPoint;
 import org.apache.flink.streaming.connectors.influxdb.InfluxDBSink;
 import org.apache.flink.streaming.connectors.rabbitmq.RMQSource;
 import org.apache.flink.streaming.connectors.rabbitmq.common.RMQConnectionConfig;
-import org.apache.flink.streaming.util.serialization.SimpleStringSchema;
 
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
@@ -51,17 +51,17 @@ public class StreamingJob {
 
 		// Set up a configuration for the RabbitMQ Source
 		final RMQConnectionConfig connectionConfig = new RMQConnectionConfig.Builder()
-				.setHost("rabbitmq-rabbitmq-ha.mqtt.svc.cluster.local")
+				.setHost("rmq-cluster-rabbitmq-ha.mqtt.svc.cluster.local")
 				.setPort(5672)
 				.setUserName("guest")
-				.setPassword("secret")
+				.setPassword("Pa55w.rd")
 				.setVirtualHost("/")
 				.build();
 		// Initiating a Data Stream from RabbitMQ
 		final DataStream<String> stream = env
 				.addSource(new RMQSource<String>(
 						connectionConfig,            // config for the RabbitMQ connection
-						"graz.sensoren.mqtt.wholerequest",                 // name of the RabbitMQ queue to consume
+						"graz.sensors.mqtt.tempF",                 // name of the RabbitMQ queue to consume
 						false,                        // use correlation ids; can be false if only at-least-once is required
 						new SimpleStringSchema()))   // deserialization schema to turn messages into Java objects
 				.setParallelism(1);              // parallel Source
@@ -75,42 +75,34 @@ public class StreamingJob {
 						// Extract the payload of the message
 						String[] input = s.split(",");
 
-
 						// Extract the sensor ID
-						String idArr = input[0];
-						String id = idArr.split(":")[1];
-
-						// Extract the Longitude
-						String longi = input[1];
-						String longitude = longi.split(":")[1];
-
-						// Extract the Latitude
-						String lat = input[2];
-						String latitude = lat.split(":")[1];
-
-						//Extract the measurement
-						String temp = input[3];
-						String temperature = temp.split(":")[1];
-
-						// Extract the humidity
-						String humd = input[4];
-						String humidity = humd.split(":")[1];
-
-						// Extract the particulate matter
-						String pm2tmp = input[5];
-						String particulateMatter = pm2tmp.split(":")[1];
-						// Extract measurement
-						String rawMeasurement = pm2tmp.split(":")[0];
-						String measurement = rawMeasurement.replaceAll("\\W", "");
+						String sensorID = input[0];
+						String id = sensorID.split(":")[1];
 
 						// Extract the timestamp
-						String ts = input[6];
-						String tsString = ts.split(":")[1];
+						String sensorTempC = input[1];
+						String tempC = sensorTempC.split(":")[1];
+
+						// Extract the timestamp
+						String sensorTS = input[2];
+						String ts = sensorTS.split(":")[1];
+
+
+						double tempCDouble;
+						double tempF = 0;
+
+						try {
+							tempCDouble = Long.parseLong(tempC);
+							tempF = (tempCDouble * 1.8) + 32;
+
+						} catch (NumberFormatException nfe) {
+							System.out.println("NumberFormatException: " + nfe.getMessage());
+						}
 
 						// Try to parse the timestamp to long datatype
 						long timestamp = System.currentTimeMillis();
 						try {
-							timestamp = Long.parseLong(tsString);
+							timestamp = Long.parseLong(ts);
 
 						} catch (NumberFormatException nfe) {
 							System.out.println("NumberFormatException: " + nfe.getMessage());
@@ -119,21 +111,17 @@ public class StreamingJob {
 						//Extract the tags
 						HashMap<String, String> tags = new HashMap<>();
 						tags.put("host", id);
-						tags.put("longitude", longitude);
-						tags.put("latitude", latitude);
 
 						HashMap<String, Object> fields = new HashMap<>();
-						fields.put("temperature", temperature);
-						fields.put("humidity", humidity);
-						fields.put("particulate matter", particulateMatter);
+						fields.put("temperatureF", tempF);
 
-						return new InfluxDBPoint(measurement, timestamp, tags, fields);
+						return new InfluxDBPoint("TempF", timestamp, tags, fields);
 					}
 				}
 		);
 
 		//Sinking the Data Stream to InfluxDB
-		InfluxDBConfig influxDBConfig = InfluxDBConfig.builder("http://influxdb.influxdb:8086", "admin", "", "mqtt")
+		InfluxDBConfig influxDBConfig = InfluxDBConfig.builder("http://influxdb.influxdb:8086", "admin", "Pa55w.rd", "mqtt")
 				.batchActions(1000)
 				.flushDuration(100, TimeUnit.MILLISECONDS)
 				.enableGzip(true)

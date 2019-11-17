@@ -22,7 +22,7 @@ under the License.
 
 	<groupId>BUEPA.RTIP.MQTT.StreamingJobs</groupId>
 	<artifactId>DetectionJob</artifactId>
-	<version>1.00</version>
+	<version>1.2.5</version>
 	<packaging>jar</packaging>
 
 	<name>Flink Quickstart Job</name>
@@ -83,6 +83,13 @@ under the License.
 			<artifactId>javatuples</artifactId>
 			<version>1.2</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.10</version>
+		</dependency>
+
 		<!-- Example:
 
 		<dependency>
