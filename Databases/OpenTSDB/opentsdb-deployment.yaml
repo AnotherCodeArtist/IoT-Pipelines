@@ -1,0 +1,38 @@
+apiVersion: apps/v1                                             
+kind: Deployment
+metadata:
+  name: opentsdb       
+  labels:
+    app: opentsdb 
+spec:
+  selector:
+    matchLabels:
+      app: opentsdb 
+      tier: opentsdb
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: opentsdb 
+        tier: opentsdb
+    spec:
+      containers:
+      - image: petergrace/opentsdb-docker:latest
+        name: opentsdb
+        env:
+        - name: OPENTSDB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: opentsdb-pass
+              key: password
+        ports:
+        - containerPort: 4242
+          name: opentsdb
+        volumeMounts:
+        - name: opentsdb-persistent-storage
+          mountPath: /data/hbase
+      volumes:
+      - name: opentsdb-persistent-storage
+        persistentVolumeClaim:
+          claimName: opentsdb-pv-claim

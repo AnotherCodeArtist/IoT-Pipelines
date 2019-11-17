@@ -1,0 +1,19 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: crate-external-service
+  labels:
+    app: crate
+spec:
+  # Create an externally reachable load balancer.
+  type: LoadBalancer
+  ports:
+    # Port 4200 for HTTP clients.
+  - port: 4200
+    name: crate-web
+    # Port 5432 for PostgreSQL wire protocol clients.
+  - port: 5432
+    name: postgres
+  selector:
+    # Apply this to all nodes with the `app:crate` label.
+    app: crate
