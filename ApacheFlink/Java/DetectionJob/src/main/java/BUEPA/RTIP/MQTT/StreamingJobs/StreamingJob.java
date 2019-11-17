@@ -164,7 +164,7 @@ public class StreamingJob {
                 //ArrayList<String> keyList = new ArrayList<String>(sensorPM2s.keySet());
                 //keyList.forEach( str -> allSensorIDs = allSensorIDs + allSensorIDs.concat(", " + str));
                 //String message = "ALARM !! Sensors with ID ; recognize a too high PM2,5 concentration";
-                //String urlString = "https://api.telegram.org/bot869277769:AAE7BREQKaEo1WjF56-Mu4FgSkPKwf-jDps/sendMessage?chat_id=601736401&text=" + message;
+                //String urlString =  + message;
                 //URL url = new URL(urlString);
                 //URLConnection con = url.openConnection();
                 //HttpURLConnection http = (HttpURLConnection)con;
