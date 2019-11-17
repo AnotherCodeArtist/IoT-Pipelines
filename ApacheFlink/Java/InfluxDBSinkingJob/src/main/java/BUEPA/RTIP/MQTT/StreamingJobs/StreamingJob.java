@@ -45,81 +45,98 @@ import java.util.concurrent.TimeUnit;
  */
 public class StreamingJob {
 
-	public static void main(String[] args) throws Exception {
-		// set up the streaming execution environment
-		final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+    public static void main(String[] args) throws Exception {
+        // set up the streaming execution environment
+        final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
-		final RMQConnectionConfig connectionConfig = new RMQConnectionConfig.Builder()
-				.setHost("rmq-cluster-rabbitmq-ha.mqtt.svc.cluster.local")
-				.setPort(5672)
-				.setUserName("guest")
-				.setPassword("Pa55w.rd")
-				.setVirtualHost("/")
-				.build();
+        final RMQConnectionConfig connectionConfig = new RMQConnectionConfig.Builder()
+                .setHost("rmq-cluster-rabbitmq-ha.mqtt.svc.cluster.local")
+                .setPort(5672)
+                .setUserName("guest")
+                .setPassword("Pa55w.rd")
+                .setVirtualHost("/")
+                .build();
 
-		// Initiating a Data Stream from RabbitMQ
-		final DataStream<String> stream = env
-				.addSource(new RMQSource<String>(
-						connectionConfig,            						// config for the RabbitMQ connection
-						"graz.sensors.mqtt.pm2.influxdbsinking",        	// name of the RabbitMQ queue to consume
-						false,                        		// use correlation ids; can be false if only at-least-once is required
-						new SimpleStringSchema()))   						// deserialization schema to turn messages into Java objects
-				.setParallelism(1);             							// non-parallel Source
+        // Initiating a Data Stream from RabbitMQ
+        final DataStream<String> stream = env
+                .addSource(new RMQSource<String>(
+                        connectionConfig,                                    // config for the RabbitMQ connection
+                        "graz.sensors.mqtt.pm2.influxdbsinking",            // name of the RabbitMQ queue to consume
+                        false,                                // use correlation ids; can be false if only at-least-once is required
+                        new SimpleStringSchema()))                        // deserialization schema to turn messages into Java objects
+                .setParallelism(1);                                        // non-parallel Source
 
-		// Converting the input datastream to InfluxDBPoint-datastream
-		final DataStream<InfluxDBPoint> influxStream = stream.map(
-				new RichMapFunction<String, InfluxDBPoint>() {
-					@Override
-					public InfluxDBPoint map(String s) throws Exception {
+        // Converting the input datastream to InfluxDBPoint-datastream
+        final DataStream<InfluxDBPoint> influxStream = stream.map(
+                new RichMapFunction<String, InfluxDBPoint>() {
+                    @Override
+                    public InfluxDBPoint map(String s) throws Exception {
 
-						// Extract the payload of the message
-						String[] input = s.split(",");
+                        // Extract the payload of the message
+                        String[] input = s.split(",");
 
-						// Extract the sensor ID
-						String sensorID = input[0];
-						String id = sensorID.split(":")[1];
+                        // Extract the sensor ID
+                        String sensorID = input[1];
+                        String unformattedID = sensorID.split(":")[1];
+                        String id = unformattedID.replaceAll(" ", "");
 
-						// Extract the particulate matter
-						String sensorPM2 = input[1];
-						String pm2 = sensorPM2.split(":")[1];
+                        // Extract the longitude
+                        String sensorLONG = input[2];
+                        String unformattedLONGTD = sensorLONG.split(":")[1];
+                        String longtd = unformattedLONGTD.replaceAll(" ", "");
 
-						// Extract the timestamp
-						String sensorTS = input[2];
-						String ts = sensorTS.split(":")[1];
+                        // Extract the latitude
+                        String sensorLAT = input[3];
+                        String unformattedLATD = sensorLAT.split(":")[1];
+                        String latd = unformattedLATD.replaceAll(" ", "");
 
-						// Try to parse the timestamp to long datatype
-						long timestamp = System.currentTimeMillis();
-						try {
-							timestamp = Long.parseLong(ts);
+                        // Extract the humidity
+                        String sensorHUM = input[4];
+                        String unformattedHUM = sensorHUM.split(":")[1];
+                        String hum = unformattedHUM.replaceAll(" ", "");
 
-						} catch (NumberFormatException nfe) {
-							System.out.println("NumberFormatException: " + nfe.getMessage());
-						}
+                        // Extract the temperature
+                        String sensorTEMP = input[5];
+                        String unformattedTEMP = sensorTEMP.split(":")[1];
+                        String temp = unformattedTEMP.replaceAll(" ", "");
 
-						//Set the tags
-						HashMap<String, String> tags = new HashMap<>();
-						tags.put("id", id);
+                        // Extract the particulate matter
+                        String sensorPM2 = input[6];
+                        String unformattedPM2 = sensorPM2.split(":")[1];
+                        String pm2 = unformattedPM2.replaceAll("[ }]+", "");
 
-						HashMap<String, Object> fields = new HashMap<>();
-						fields.put("pm2", pm2);
+                        // Create the timestamp
+                        long timestamp = System.currentTimeMillis();
 
-						return new InfluxDBPoint("PM2,5", timestamp, tags, fields);
-					}
-				}
-		);
+                        //Set the tags
+                        HashMap<String, String> tags = new HashMap<>();
+                        tags.put("id", id);
+                        tags.put("longitude", longtd);
+                        tags.put("latitude", latd);
 
-		//Sinking the Data Stream to InfluxDB
-		InfluxDBConfig influxDBConfig = InfluxDBConfig.builder("http://influxdb.influxdb:8086", "admin", "Pa55w.rd", "mqtt")
-				.batchActions(1000)
-				.flushDuration(100, TimeUnit.MILLISECONDS)
-				.enableGzip(true)
-				.build();
+                        //Set the fields
+                        HashMap<String, Object> fields = new HashMap<>();
+                        fields.put("pm2", pm2);
+                        fields.put("humidity", hum);
+                        fields.put("tempC", temp);
 
-		influxStream.addSink(new InfluxDBSink(influxDBConfig));
+                        return new InfluxDBPoint("Pollution", timestamp, tags, fields);
+                    }
+                }
+        );
+
+        //Sinking the Data Stream to InfluxDB
+        InfluxDBConfig influxDBConfig = InfluxDBConfig.builder("http://influxdb.influxdb:8086", "admin", "Pa55w.rd", "mqtt")
+                .batchActions(1000)
+                .flushDuration(100, TimeUnit.MILLISECONDS)
+                .enableGzip(true)
+                .build();
+
+        influxStream.addSink(new InfluxDBSink(influxDBConfig));
 
 
-		// execute program
-		env.execute("MQTT InfluxDBSinking StreamingJob");
+        // execute program
+        env.execute("MQTT InfluxDBSinking StreamingJob");
 
-	}
+    }
 }
