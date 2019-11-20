@@ -29,10 +29,6 @@ import org.apache.flink.streaming.connectors.rabbitmq.RMQSource;
 import org.apache.flink.streaming.connectors.rabbitmq.common.RMQConnectionConfig;
 import org.apache.flink.types.Row;
 import org.javatuples.Triplet;
-import scala.Tuple3;
-
-import java.util.HashMap;
-import java.util.stream.Stream;
 
 /**
  * Skeleton for a Flink Streaming Job.
@@ -48,91 +44,80 @@ import java.util.stream.Stream;
  */
 public class StreamingJob {
 
-	public static void main(String[] args) throws Exception {
-		// set up the streaming execution environment
-		final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-		ParameterTool parameters = ParameterTool.fromArgs(args);
+    public static Row insertingRow;
 
-		final RMQConnectionConfig connectionConfig = new RMQConnectionConfig.Builder()
-				.setHost("rabbitmq-service.mqtt.svc.cluster.local")
-				.setPort(5672)
-				.setUserName("guest")
-				.setPassword("Pa55w.rd")
-				.setVirtualHost("/")
-				.build();
+    public static void main(String[] args) throws Exception {
+        // set up the streaming execution environment
+        final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+        ParameterTool parameters = ParameterTool.fromArgs(args);
 
-		// Initiating a Data Stream from RabbitMQ
-		final DataStream<String> stream = env
-				.addSource(new RMQSource<String>(
-						connectionConfig,            						// config for the RabbitMQ connection
-						"graz.sensors.mqtt.pm2.cratedbsinking",        	// name of the RabbitMQ queue to consume
-						false,                        		// use correlation ids; can be false if only at-least-once is required
-						new SimpleStringSchema()))   						// deserialization schema to turn messages into Java objects
-				.setParallelism(1);
+        final RMQConnectionConfig connectionConfig = new RMQConnectionConfig.Builder()
+                .setHost("rabbitmq-service.mqtt.svc.cluster.local")
+                .setPort(5672)
+                .setUserName("guest")
+                .setPassword("Pa55w.rd")
+                .setVirtualHost("/")
+                .build();
 
-		// non-parallel Source
-		final DataStream<Triplet<String, String, Long>> RMQStream = stream.map(
-				new RichMapFunction<String, Triplet<String, String, Long>>() {
-					@Override
-					public Triplet<String, String, Long> map(String s) throws Exception {
+        // Initiating a Data Stream from RabbitMQ
+        final DataStream<String> stream = env
+                .addSource(new RMQSource<String>(
+                        connectionConfig,                                    // config for the RabbitMQ connection
+                        "graz.sensors.mqtt.pm2.cratedbsinking",            // name of the RabbitMQ queue to consume
+                        false,                                // use correlation ids; can be false if only at-least-once is required
+                        new SimpleStringSchema()))                        // deserialization schema to turn messages into Java objects
+                .setParallelism(1);
 
-						// Extract the payload of the message
-						String[] input = s.split(",");
+        // non-parallel Source
+        final DataStream<Triplet<String, String, Long>> RMQStream = stream.map(
+                new RichMapFunction<String, Triplet<String, String, Long>>() {
+                    @Override
+                    public Triplet<String, String, Long> map(String s) throws Exception {
 
-						// Extract the sensor ID
-						String sensorID = input[0];
-						String id = sensorID.split(":")[1];
+                        // Extract the payload of the message
+                        String[] input = s.split(",");
 
-						// Extract the particulate matter
-						String sensorPM2 = input[5];
-						String pm2 = sensorPM2.split(":")[1];
+                        // Extract the sensor ID
+                        String sensorID = input[0];
+                        String id = sensorID.split(":")[1];
 
-						// Extract the timestamp
-						String sensorTS = input[2];
-						String ts = sensorTS.split(":")[1];
+                        // Extract the particulate matter
+                        String sensorPM2 = input[5];
+                        String pm2 = sensorPM2.split(":")[1];
 
-						// Try to parse the timestamp to long datatype
-						long timestamp = System.currentTimeMillis();
-						try {
-							timestamp = Long.parseLong(ts);
+                        // Extract the timestamp
+                        String sensorTS = input[2];
+                        String ts = sensorTS.split(":")[1];
 
-						} catch (NumberFormatException nfe) {
-							System.out.println("NumberFormatException: " + nfe.getMessage());
-						}
+                        //long timestamp = System
+                        //new Row(3,[id, pm2, timestamp]);
+                        return new Triplet(id, pm2, ts);
+                    }
+                }
+        );
 
-						new Row (3,[id,pm2,timestamp]);
-						return new Triplet(id, pm2, timestamp);
-					}
-				}
-		);
+        RMQStream
+                .map( tplt -> Row.of(0, tplt.getValue0(), 1, tplt.getValue1(), 2, tplt.getValue(2)))
+                .writeUsingOutputFormat(createJDBCOutputFormat(parameters));
 
-		RMQStream.writeUsingOutputFormat(createJDBCOutputFormat(parameters));
+        // execute program
+        env.execute("Flink CrateDB Sinking Job");
+    }
 
-		// execute program
-		env.execute("Flink CrateDB Sinking Job");
-	}
-
-	private static OutputFormat<Row> createJDBCOutputFormat(ParameterTool parameters) {
-		return JDBCOutputFormat.buildJDBCOutputFormat()
-				.setDrivername( "io.crate.client.jdbc.CrateDriver" )
-				.setDBUrl(
-						String.format( "crate://%s/" , parameters.getRequired( "crate.hosts" ))
-				)
-				.setBatchInterval(parameters.getInt( "batch.interval.ms" , 5000))
-				.setUsername(parameters.get( "crate.user" , "crate" ))
-				.setPassword(parameters.get( "crate.password" , "" ))
-				.setQuery(
-						String.format(
-								"INSERT INTO %s (payload) VALUES (?)" ,
-								parameters.getRequired( "crate.table" ))
-				)
-				.finish();
-	}
-
-	private static Row convertToRow(Stream<Triplet<String, String, Long>> rmqstream){
-		rmqstream.map( tplt ->
-		);
-
-	}
-
+    private static OutputFormat<Row> createJDBCOutputFormat(ParameterTool parameters) {
+        return JDBCOutputFormat.buildJDBCOutputFormat()
+                .setDrivername("io.crate.client.jdbc.CrateDriver")
+                .setDBUrl(
+                        String.format("crate://%s/", parameters.getRequired("crate.hosts"))
+                )
+                .setBatchInterval(parameters.getInt("batch.interval.ms", 5000))
+                .setUsername(parameters.get("crate.user", "crate"))
+                .setPassword(parameters.get("crate.password", ""))
+                .setQuery(
+                        String.format(
+                                "INSERT INTO %s (payload) VALUES (?)",
+                                parameters.getRequired("crate.table"))
+                )
+                .finish();
+    }
 }
