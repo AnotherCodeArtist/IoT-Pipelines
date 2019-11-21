@@ -10,7 +10,7 @@ Kafka Topics have to be created first as following.
 `bin/kafka-topics –-bootstrap-server <IP-address of Kafka NodePort Service>:19092 --create --topic usecase-outputMax --partitions 1 --replication-factor 1`
 
 ### Build .jar File
-Direct in to the directory.
+Direct into the directory.
 
 `mvn package`
 
