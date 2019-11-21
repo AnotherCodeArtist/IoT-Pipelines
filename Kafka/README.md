@@ -1,4 +1,4 @@
-# First steps
+# First steps of Kafkastreams
 
 ### Create the Topics
 Kafka Topics have to be created first as following.
