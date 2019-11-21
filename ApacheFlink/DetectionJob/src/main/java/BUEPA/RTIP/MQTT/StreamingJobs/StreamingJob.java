@@ -21,11 +21,14 @@ package BUEPA.RTIP.MQTT.StreamingJobs;
 import org.apache.flink.api.common.functions.Function;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
+import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.functions.windowing.ProcessAllWindowFunction;
 import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
 import org.apache.flink.streaming.api.functions.windowing.WindowFunction;
+import org.apache.flink.streaming.api.windowing.assigners.SlidingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
@@ -34,6 +37,7 @@ import org.apache.flink.streaming.connectors.rabbitmq.RMQSource;
 import org.apache.flink.streaming.connectors.rabbitmq.common.RMQConnectionConfig;
 import org.apache.flink.util.Collector;
 import org.javatuples.Triplet;
+
 import java.io.IOException;
 import java.io.Serializable;
 
@@ -123,44 +127,27 @@ public class StreamingJob {
                 }
         );
 
-        final DataStream processedDT =
+        /**  This Stream evaluates Streams for each sensor, since it is keybed by the sensor ID => maybe needed later
+
+         final DataStream processedDT =
+         extractedDataStream
+         //.filter(t -> t.getValue1() > 30) // If we only want the high pm2 concentration
+         .keyBy(t -> t.getValue0()) // keyed by sensor IDs
+         .window(SlidingProcessingTimeWindows.of(Time.seconds(30), Time.seconds(10)))
+         //.timeWindow(Time.seconds(20), Time.seconds(10)) // Sliding Window
+         //.timeWindow(Time.seconds(10)) // TumblingTimeWindow
+         // .window(TumblingProcessingTimeWindows.of(Time.seconds(10))) //TumblingProcessingTimeWindow
+         .process(new DetectTooHighAirPollution());
+         //.writeAsText("/tmp/alarm.txt", FileSystem.WriteMode.OVERWRITE); // Write to File Sink
+
+         processedDT.print().setParallelism(1);
+         **/
+
         extractedDataStream
-                //.filter(t -> t.getValue1() > 30)
-                .keyBy(t -> t.getValue0()) // keyed by sensor IDs
-                //.keyBy(0)
-                //.window(SlidingProcessingTimeWindows.of(Time.seconds(30), Time.seconds(10)))
-                //.timeWindow(Time.seconds(20), Time.seconds(10))
-                //.timeWindow(Time.seconds(10))
-                .window(TumblingProcessingTimeWindows.of(Time.seconds(10)))
-                .apply(new WindowFunction<Triplet<String, Double, Long>, String, String, TimeWindow>() {
-
-                    @Override
-                    public void apply(String key,
-                                      TimeWindow window,
-                                      Iterable<Triplet<String, Double, Long>> input,
-                                      Collector<String> out) throws Exception {
-                        long count = 0;
-
-                        for (Triplet<String, Double, Long> i : input) {
-                            count++;
-                        }
-
-                        if (count > 1) {
-                            out.collect("yap :D!: " + count);
-                        } else {
-                            out.collect("nope :(");
-                        }
-
-                    }
-                });
-                //.trigger(CountTrigger.of(5))
-                //.process(new DetectTooHighAirPollution());
-                //.writeAsText("/tmp/alarm.txt", FileSystem.WriteMode.OVERWRITE);
-
-        processedDT.print().setParallelism(1);
-
-        //processedDT.writeAsText("/tmp/alarm.txt", FileSystem.WriteMode.OVERWRITE);
-        //extractedDataStream.writeAsText("/tmp/alarm.txt", FileSystem.WriteMode.OVERWRITE);
+                .filter(t -> t.getValue1() > 30)
+                .windowAll(TumblingProcessingTimeWindows.of(Time.seconds(15)))
+                .process(new DetectTooHighAirPollution())
+                .print();
 
 
         // execute program
@@ -169,11 +156,10 @@ public class StreamingJob {
     }
 
     public static class DetectTooHighAirPollution
-            extends ProcessWindowFunction<Triplet<String, Double, Long>, String, String, TimeWindow> {
-
+            extends ProcessAllWindowFunction<Triplet<String, Double, Long>, String, TimeWindow> {
 
         @Override
-        public void process(String key, Context context, Iterable<Triplet<String, Double, Long>> input, Collector<String> out) throws IOException {
+        public void process(Context context, Iterable<Triplet<String, Double, Long>> input, Collector<String> out) throws IOException {
 
             long count = 0;
 
@@ -181,43 +167,35 @@ public class StreamingJob {
                 count++;
             }
 
-            if (count > 1) {
-                out.collect("Window:" + context.window() + " ;yap :D!: " + count);
+            if (count >= 10) {
+                out.collect(count + " Sensors, report a too high concentration of PM2!");
             } else {
-                out.collect("Window:" + context.window() + " nope :(");
+                out.collect("Dosenbier saufen ;-)");
             }
-
-            //String test = String.valueOf(count);
-
-
-            /**
-             input.iterator().forEachRemaining(trplt -> {
-             if (trplt.getValue1() > 30) {
-             pm2s.add(trplt.getValue1());
-             //sensorPM2s.put(trplt.getValue0(), trplt.getValue1());
-             }
-             });
-
-
-             if (pm2s.size() > 2) {
-             message = "ALARM!";
-             //ArrayList<String> keyList = new ArrayList<String>(sensorPM2s.keySet());
-             //keyList.forEach( str -> allSensorIDs = allSensorIDs + allSensorIDs.concat(", " + str));
-             //String message = "ALARM !! Sensors with ID ; recognize a too high PM2,5 concentration";
-             //String urlString =  + message;
-             //URL url = new URL(urlString);
-             //URLConnection con = url.openConnection();
-             //HttpURLConnection http = (HttpURLConnection)con;
-             //http.setRequestMethod("POST");
-             //http.setDoOutput(true);
-             //HttpClient httpclient = HttpClients.createDefault();
-             // HttpPost httppost = new HttpPost(urlString);
-             //HttpResponse response = httpclient.execute(httppost);
-             //HttpEntity entity = response.getEntity();
-             //out.collect(message + " " + String.valueOf(sensorPM2s.size()));
-             }
-             **/
         }
     }
 }
+
+/**
+ * This is the ProcessWindowFunction which is applied onto a keyed Stream
+ * <p>
+ * public static class DetectTooHighAirPollution
+ * extends ProcessWindowFunction<Triplet<String, Double, Long>, String, String, TimeWindow> {
+ *
+ * @Override public void process(String key, Context context, Iterable<Triplet<String, Double, Long>> input, Collector<String> out) throws IOException {
+ * <p>
+ * long count = 0;
+ * <p>
+ * for (Triplet<String, Double, Long> i : input) {
+ * count++;
+ * }
+ * <p>
+ * if (count > 1) {
+ * out.collect("Window:" + context.window() + " ;yap :D!: " + count);
+ * } else {
+ * out.collect("Window:" + context.window() + " nope :(");
+ * }
+ * }
+ * }
+ **/
 
