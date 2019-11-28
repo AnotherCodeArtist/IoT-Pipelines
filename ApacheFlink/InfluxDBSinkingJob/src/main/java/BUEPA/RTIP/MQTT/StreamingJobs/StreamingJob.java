@@ -31,43 +31,47 @@ import org.apache.flink.streaming.connectors.rabbitmq.common.RMQConnectionConfig
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Skeleton for a Flink Streaming Job.
- *
- * <p>For a tutorial how to write a Flink streaming application, check the
- * tutorials and examples on the <a href="http://flink.apache.org/docs/stable/">Flink Website</a>.
- *
- * <p>To package your application into a JAR file for execution, run
- * 'mvn clean package' on the command line.
- *
- * <p>If you change the name of the main class (with the public static void main(String[] args))
- * method, change the respective entry in the POM.xml file (simply search for 'mainClass').
- */
 public class StreamingJob {
 
     public static void main(String[] args) throws Exception {
+
+        HashMap<String, String> conf = new HashMap<String, String>();
+
+        conf.put("rmq-hostname", "rmq-cluster-rabbitmq-ha.mqtt.svc.cluster.local");
+        conf.put("rmq-port", "5672");
+        conf.put("rmq-username", "guest");
+        conf.put("rmq-password", "Pa55w.rd");
+        conf.put("rmq-vhost", "/");
+        conf.put("rmq-queuename", "graz.sensors.mqtt.pm2.influxDBSinking");
+
+        conf.put("influx-hostname", "http://influxdb.influxdb:8086");
+        conf.put("influx-username", "admin");
+        conf.put("influx-password", "Pa55w.rd");
+        conf.put("influx-db", "mqtt");
+
         // set up the streaming execution environment
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
+        // Set up a configuration for the RabbitMQ Source
         final RMQConnectionConfig connectionConfig = new RMQConnectionConfig.Builder()
-                .setHost("rmq-cluster-rabbitmq-ha.mqtt.svc.cluster.local")
-                .setPort(5672)
-                .setUserName("guest")
-                .setPassword("Pa55w.rd")
-                .setVirtualHost("/")
+                .setHost(conf.get("rmq-hostname"))
+                .setPort(Integer.parseInt(conf.get("rmq-port")))
+                .setUserName(conf.get("rmq-username"))
+                .setPassword(conf.get("rmq-password"))
+                .setVirtualHost(conf.get("rmq-vhost"))
                 .build();
 
         // Initiating a Data Stream from RabbitMQ
-        final DataStream<String> stream = env
+        final DataStream<String> RMQDS = env
                 .addSource(new RMQSource<String>(
-                        connectionConfig,                                    // config for the RabbitMQ connection
-                        "graz.sensors.mqtt.pm2.influxdbsinking",            // name of the RabbitMQ queue to consume
-                        false,                                // use correlation ids; can be false if only at-least-once is required
-                        new SimpleStringSchema()))                        // deserialization schema to turn messages into Java objects
-                .setParallelism(1);                                        // non-parallel Source
+                        connectionConfig,                   // config for the RabbitMQ connection
+                        conf.get("rmq-queuename"),          // name of the RabbitMQ queue to consume
+                        false,               // use correlation ids; can be false if only at-least-once is required
+                        new SimpleStringSchema()))          // deserialization schema to turn messages into Java objects
+                .setParallelism(1);                         // non-parallel Source        // non-parallel Source
 
         // Converting the input datastream to InfluxDBPoint-datastream
-        final DataStream<InfluxDBPoint> influxStream = stream.map(
+        final DataStream<InfluxDBPoint> influxDBSinkingDS = RMQDS.map(
                 new RichMapFunction<String, InfluxDBPoint>() {
                     @Override
                     public InfluxDBPoint map(String s) throws Exception {
@@ -126,13 +130,13 @@ public class StreamingJob {
         );
 
         //Sinking the Data Stream to InfluxDB
-        InfluxDBConfig influxDBConfig = InfluxDBConfig.builder("http://influxdb.influxdb:8086", "admin", "Pa55w.rd", "mqtt")
+        InfluxDBConfig influxDBConfig = InfluxDBConfig.builder(conf.get("influx-hostname"), conf.get("influx-username"), conf.get("influx-password"), conf.get("influx-db"))
                 .batchActions(1000)
                 .flushDuration(100, TimeUnit.MILLISECONDS)
                 .enableGzip(true)
                 .build();
 
-        influxStream.addSink(new InfluxDBSink(influxDBConfig));
+        influxDBSinkingDS.addSink(new InfluxDBSink(influxDBConfig));
 
 
         // execute program
