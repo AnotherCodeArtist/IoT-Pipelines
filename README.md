@@ -33,7 +33,7 @@ In this folder all necessary files for recreating the Kubernetes cluster are sto
 
 * The Ansible Playbook for installing the prerequisites
 * An example cluster.yml used for our implementation. This cluster utilizes three nodes, where the first one is a controlplane and etcd node.
-the two remaining nodes are etcd as well as worker nodes.
+the two remaining nodes are etcd nodes as well as worker nodes.
 
 ## Kafka
 
@@ -47,6 +47,7 @@ In this folder a fork of the https://github.com/BrightTag/kafkameter is stored. 
 
 * Support for generating message Keys.
 * Support for setting Sensor IDs for the message.
+* Inside the Generators folder, the loadgenerator implementation can be found. For build instructions please consult the corresponding .bat file.
 
 This folder also includes the testplans (JMeter version 5.1.1) used for testing Kafka and MQTT.
 
