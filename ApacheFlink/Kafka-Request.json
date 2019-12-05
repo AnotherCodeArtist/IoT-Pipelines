@@ -1,0 +1,2 @@
+{"sensor": 12345678}  {"measurement":"pollution", "id": 12345678, "long": 99, "lat": 99, "humidity": 50, "temperature": 25.0, "pm2": 20.5}
+HEADER       EMPTY SPACE (0-n)     PAYLOAD
