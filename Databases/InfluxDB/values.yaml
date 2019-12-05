@@ -1,0 +1,165 @@
+affinity: {}
+backup:
+  annotations: {}
+  enabled: false
+  schedule: 0 0 * * *
+config:
+  admin:
+    bind_address: 8083
+    enabled: false
+    https_certificate: /etc/ssl/influxdb.pem
+    https_enabled: false
+  collectd:
+    auth_file: /etc/collectd/auth_file
+    batch_pending: 10
+    batch_size: 5000
+    batch_timeout: 10s
+    bind_address: 25826
+    database: collectd
+    enabled: false
+    read_buffer: 0
+    retention_policy: autogen
+    security_level: none
+    typesdb: /usr/share/collectd/types.db
+  continuous_queries:
+    enabled: true
+    log_enabled: true
+    run_interval: 1s
+  coordinator:
+    log_queries_after: 0s
+    max_concurrent_queries: 0
+    max_select_buckets: 0
+    max_select_point: 0
+    max_select_series: 0
+    query_timeout: 0s
+    write_timeout: 10s
+  data:
+    cache_max_memory_size: 1073741824
+    cache_snapshot_memory_size: 26214400
+    cache_snapshot_write_cold_duration: 10m0s
+    compact_full_write_cold_duration: 4h0m0s
+    max_series_per_database: 1000000
+    max_values_per_tag: 100000
+    query_log_enabled: true
+    trace_logging_enabled: false
+  graphite:
+    batch_pending: 10
+    batch_size: 5000
+    batch_timeout: 1s
+    bind_address: 2003
+    consistency_level: one
+    database: graphite
+    enabled: false
+    protocol: tcp
+    retention_policy: autogen
+    separator: .
+    udp_read_buffer: 0
+  http:
+    auth_enabled: false
+    bind_address: 8086
+    bind_socket: /var/run/influxdb.sock
+    enabled: true
+    flux_enabled: true
+    https_certificate: /etc/ssl/influxdb.pem
+    https_enabled: false
+    https_private_key: ""
+    log_enabled: true
+    max_connection_limit: 0
+    max_row_limit: 10000
+    pprof_enabled: true
+    realm: InfluxDB
+    shared_secret: beetlejuicebeetlejuicebeetlejuice
+    unix_socket_enabled: false
+    write_tracing: false
+  logging:
+    format: auto
+    level: info
+    supress_logo: false
+  meta:
+    logging_enabled: true
+    retention_autocreate: true
+  monitor:
+    store_database: _internal
+    store_enabled: true
+    store_interval: 10s
+  opentsdb:
+    batch_pending: 5
+    batch_size: 1000
+    batch_timeout: 1s
+    bind_address: 4242
+    certificate: /etc/ssl/influxdb.pem
+    consistency_level: one
+    database: opentsdb
+    enabled: false
+    log_point_errors: true
+    retention_policy: autogen
+    tls_enabled: false
+  reporting_disabled: false
+  retention:
+    check_interval: 30m0s
+    enabled: true
+  rpc:
+    bind_address: 8088
+    enabled: true
+  shard_precreation:
+    advance_period: 30m0s
+    check_interval: 10m0s
+    enabled: true
+  storage_directory: /var/lib/influxdb
+  subscriber:
+    ca_certs: ""
+    enabled: true
+    http_timeout: 30s
+    insecure_skip_verify: false
+    write_buffer_size: 1000
+    write_concurrency: 40
+  udp:
+    batch_pending: 10
+    batch_size: 5000
+    batch_timeout: 1s
+    bind_address: 8089
+    database: udp
+    enabled: false
+    precision: ns
+    read_buffer: 0
+    retention_policy: autogen
+env: {}
+image:
+  pullPolicy: IfNotPresent
+  repository: influxdb
+  tag: 1.7.6-alpine
+ingress:
+  annotations: null
+  enabled: false
+  hostname: influxdb.foobar.com
+  tls: false
+initScripts:
+  enabled: false
+  scripts:
+    init.iql: |+
+      CREATE DATABASE "telegraf" WITH DURATION 30d REPLICATION 1 NAME "rp_30d"
+
+livenessProbe:
+  probePath: /ping
+nodeSelector: {}
+persistence:
+  accessMode: ReadWriteOnce
+  enabled: true
+  size: 8Gi
+podAnnotations: {}
+readinessProbe:
+  probePath: /ping
+resources: {}
+service:
+  type: ClusterIP
+setDefaultUser:
+  activeDeadline: 300
+  enabled: false
+  image: appropriate/curl:latest
+  restartPolicy: OnFailure
+  user:
+    password: Pa55w.rd
+    privileges: WITH ALL PRIVILEGES
+    username: admin
+tolerations: []
+
