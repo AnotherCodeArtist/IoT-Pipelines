@@ -1,11 +1,12 @@
-This is an IoT project conducted by students of the UAS JOANNEUM as part of the bachelor's programme of [Information Management](https://www.fh-joanneum.at/informationsmanagement/bachelor/).
+This is an IoT project conducted by students of the UAS JOANNEUM as part of the bachelor's programme of [Information Management](https://www.fh-joanneum.at/informationsmanagement/bachelor/). The goal was to build two IoT pipelines. One using Kafka, Kafka Connect and Kafka Streams for ingestion and stream processing. The other uses MQTT, RabbitMQ as broker and Apache Flink as stream processing engine. Both pipelines persist data in an InfluxDB (Time-Series DB) and visualize data with Grafana.
+
+After both pipelines have been deployed, they are load tested with Jmeter.
 
 # Responsible Persons
 
 * @AnotherCodeArtist is the Mentor and guiding person of this project.
 
-* @GregorFernbach is responsible for the ingestion and stream processing of the MQTT IoT data. His tasks are to find a MQTT broker product, deploy it and configure it to have a connection to the JMeter script which will provice the data.
-Moreover the broker should have a connection to the Stream processing engine (Apache Flink). When the data enters the stream processing engine it should also be sinked in a Time-Serie Database (InfluxDB). Thus a connector in Apache Flink to the InfluxDB is needed.
+* @GregorFernbach is responsible for MQTT Data ingestion and Streamprocessing with Apache Flink.
 
 * @gzei is responsible for the infrastructure (Kubernetes, NFS, Hardware and VMs).
 
@@ -24,6 +25,10 @@ All members are responsible for the loadtesting.
 * Debian 10.1 servers
 * external NFS server for centralized storage
 * SSDs are highly recommended
+** Apache Flink **
+* Maven
+* Java
+* IntelliJ as IDE recommended
 
 # Structure
 
@@ -40,6 +45,28 @@ the two remaining nodes are etcd nodes as well as worker nodes.
 ## Databases
 
 ## ApacheFlink
+
+Is the Stream Processing Engine for the MQTT pipeline.
+
+For the deployment of Apache Flink  the official 'yml' files from the homepage (https://ci.apache.org/projects/flink/flink-docs-stable/ops/deployment/kubernetes.html) have been used. Moreover they are accessible under ApacheFlink\Deployment.
+
+Under ApacheFlink\StreamingJobs the source code of the Streaming Jobs can be found. There are:
+
+- DetectionJob-rmq: Represents the whole RabbitMQ Streaming Job with Persisting raw Sensor Data, processed Sensor Data and Area Output with Telegram.
+- DetectionJob-rmq-loadtest: Represents the partial RabbitMQ Streaming Job which only persists raw Sensor Data and processed Sensor Data for the load test.
+- DetectionJob-kafka: Represents the whole Kafka Streaming Job with Persisting raw Sensor Data, processed Sensor Data and Area Output with Telegram.
+- DetectionJob-kafka-loadtest: Represents the partial Kafka Streaming Job which only persists raw Sensor Data and processed Sensor Data for the load test.
+
+In order to create '.jar' files out of the source code, you need maven installed and have to run 'mvn clean install'.
+Then you can upload the jar to flink and submit with your parallelism properties.
+
+For configuring the RabbitMQ connector see the [Official Docs]: https://ci.apache.org/projects/flink/flink-docs-stable/dev/connectors/rabbitmq.html and the [Source Code]: https://github.com/apache/flink/tree/master/flink-connectors/flink-connector-rabbitmq/src/main/java/org/apache/flink/streaming/connectors/rabbitmq.
+
+For configuring the Apache Kafka connector see the [Official Docs]: https://ci.apache.org/projects/flink/flink-docs-stable/dev/connectors/kafka.html, and also the [Training from Veverica]: https://training.ververica.com/exercises/toFromKafka.html.
+
+For configuring the InfluxDB connector see the [Apache Bahir Docs]: https://bahir.apache.org/docs/flink/current/flink-streaming-influxdb/ from which this connector comes from.
+
+For configuring the telegram API (using Botfather) see the [Official Docs]: https://core.telegram.org/
 
 ## JMeter
 
