@@ -1,0 +1,22 @@
+{
+  "name" : "influxkafka",
+  "config" :{
+  "name": "influxkafka",
+  "connector.class": "com.datamountaineer.streamreactor.connect.influx.InfluxSinkConnector",
+  "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+  "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+  "topics": "usecaseOutputTrend3",
+  "connect.influx.url": "http://influxdb.influxdb:8086",
+  "connect.influx.db": "kafka",
+  "connect.influx.username": "admin",
+  "connect.influx.kcql": "INSERT INTO pollution SELECT * FROM usecaseOutputTrend3 WITHTIMESTAMP sys_time()",
+  "connect.progress.enabled": "false",
+  "errors.tolerance": "all",
+  "errors.log.enable": "true",
+  "value.converter.schemas.enable": "false",
+  "key.converter.schemas.enable": "false",
+  "transforms": "ReplaceField",
+  "transforms.ReplaceField.type": "org.apache.kafka.connect.transforms.ReplaceField$Value",
+  "transforms.ReplaceField.blacklist": "pair"
+}
+}

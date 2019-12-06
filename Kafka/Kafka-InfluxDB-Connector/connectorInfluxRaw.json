@@ -1,0 +1,19 @@
+{
+  "name" : "influxkafkaRaw",
+  "config" :{
+  "name": "influxkafkaRaw",
+  "connector.class": "com.datamountaineer.streamreactor.connect.influx.InfluxSinkConnector",
+  "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+  "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+  "topics": "usecase-input3",
+  "connect.influx.url": "http://influxdb.influxdb:8086",
+  "connect.influx.db": "kafka",
+  "connect.influx.username": "admin",
+  "connect.influx.kcql": "INSERT INTO pollutionRaw SELECT * FROM usecase-input3 WITHTIMESTAMP sys_time()",
+  "connect.progress.enabled": "false",
+  "errors.tolerance": "all",
+  "errors.log.enable": "true",
+  "value.converter.schemas.enable": "false",
+  "key.converter.schemas.enable": "false"
+}
+}
