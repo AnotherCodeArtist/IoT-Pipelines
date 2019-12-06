@@ -78,6 +78,8 @@ The Connector used is from https://docs.lenses.io/connectors/sink/influx.html.
 
 ## Databases
 
+In **Databases** all files for redeploying the databases **CrateDB**, **InfluxDB** and **OpenTSDB** on Kubernetes are stored. For both pipelines, MQTT and Kafka, only the database InfluxDB was used. The file `values.yaml`is mainly taken from the helm chart **stable/influxdb**. 
+
 ## ApacheFlink
 
 Is the Stream Processing Engine for the MQTT pipeline.
