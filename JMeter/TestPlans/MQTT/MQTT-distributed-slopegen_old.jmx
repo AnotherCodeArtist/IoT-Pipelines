@@ -16,14 +16,13 @@
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
-          <intProp name="LoopController.loops">-1</intProp>
+          <stringProp name="LoopController.loops">3000</stringProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">8</stringProp>
-        <stringProp name="ThreadGroup.ramp_time"></stringProp>
-        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.num_threads">1</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <boolProp name="ThreadGroup.scheduler">true</boolProp>
         <stringProp name="ThreadGroup.duration">30</stringProp>
         <stringProp name="ThreadGroup.delay"></stringProp>
-        <boolProp name="ThreadGroup.delayedStart">true</boolProp>
       </ThreadGroup>
       <hashTree>
         <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="Transaction Controller" enabled="true">
@@ -31,33 +30,9 @@
           <boolProp name="TransactionController.parent">false</boolProp>
         </TransactionController>
         <hashTree>
-          <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="JSR223 Sampler" enabled="true">
-            <stringProp name="cacheKey">true</stringProp>
-            <stringProp name="filename"></stringProp>
-            <stringProp name="parameters"></stringProp>
-            <stringProp name="script">String param = &quot;${__machineIP}&quot;;
-props.put(&quot;threadOffset&quot;, Integer.toString(0)); 
-if (param == &quot;10.15.207.28&quot;) {    
-	props.put(&quot;threadOffset&quot;, Integer.toString(0)); 
-	log.info props.get(&quot;threadOffset&quot;);
-} else if(param == &quot;10.15.206.181&quot;){    
-    props.put(&quot;threadOffset&quot;, Integer.toString(2000)); 
-    }
-    else if(param == &quot;10.15.204.123&quot;){    
-    props.put(&quot;threadOffset&quot;, Integer.toString(4000)); 
-    }
-    else if(param == &quot;10.15.207.113&quot;){    
-    props.put(&quot;threadOffset&quot;, Integer.toString(6000)); 
-    }
-    else if(param == &quot;10.15.200.39&quot;){    
-    props.put(&quot;threadOffset&quot;, Integer.toString(8000)); 
-    }</stringProp>
-            <stringProp name="scriptLanguage">groovy</stringProp>
-          </JSR223Sampler>
-          <hashTree/>
           <net.xmeter.samplers.ConnectSampler guiclass="net.xmeter.gui.ConnectSamplerUI" testclass="net.xmeter.samplers.ConnectSampler" testname="MQTT Connect" enabled="true">
-            <stringProp name="mqtt.server">172.17.100.55</stringProp>
-            <stringProp name="mqtt.port">31204</stringProp>
+            <stringProp name="mqtt.server">172.17.100.103</stringProp>
+            <stringProp name="mqtt.port">1883</stringProp>
             <stringProp name="mqtt.version">3.1.1</stringProp>
             <stringProp name="mqtt.conn_timeout">10</stringProp>
             <stringProp name="mqtt.protocol">TCP</stringProp>
@@ -69,7 +44,7 @@ if (param == &quot;10.15.207.28&quot;) {
             <stringProp name="mqtt.user_name">guest</stringProp>
             <stringProp name="mqtt.password">Pa55w.rd</stringProp>
             <stringProp name="mqtt.client_id_prefix">conn_</stringProp>
-            <boolProp name="mqtt.client_id_suffix">true</boolProp>
+            <boolProp name="mqtt.client_id_suffix">false</boolProp>
             <stringProp name="mqtt.conn_keep_alive">300</stringProp>
             <stringProp name="mqtt.conn_attampt_max">0</stringProp>
             <stringProp name="mqtt.reconn_attampt_max">0</stringProp>
@@ -86,11 +61,84 @@ if (param == &quot;10.15.207.28&quot;) {
             <boolProp name="mqtt.retained_message">false</boolProp>
           </net.xmeter.samplers.PubSampler>
           <hashTree/>
+          <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="Java Anfrage (Request)" enabled="true">
+            <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" enabled="true">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="kafka_brokers" elementType="Argument">
+                  <stringProp name="Argument.name">kafka_brokers</stringProp>
+                  <stringProp name="Argument.value">172.17.100.51:31090</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+                <elementProp name="kafka_topic" elementType="Argument">
+                  <stringProp name="Argument.name">kafka_topic</stringProp>
+                  <stringProp name="Argument.value">usecase-input</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+                <elementProp name="kafka_key" elementType="Argument">
+                  <stringProp name="Argument.name">kafka_key</stringProp>
+                  <stringProp name="Argument.value">${TAG}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+                <elementProp name="kafka_message" elementType="Argument">
+                  <stringProp name="Argument.name">kafka_message</stringProp>
+                  <stringProp name="Argument.value">${MESSAGE}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+                <elementProp name="kafka_message_serializer" elementType="Argument">
+                  <stringProp name="Argument.name">kafka_message_serializer</stringProp>
+                  <stringProp name="Argument.value">org.apache.kafka.common.serialization.StringSerializer</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+                <elementProp name="kafka_key_serializer" elementType="Argument">
+                  <stringProp name="Argument.name">kafka_key_serializer</stringProp>
+                  <stringProp name="Argument.value">org.apache.kafka.common.serialization.StringSerializer</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+                <elementProp name="kafka_ssl_keystore" elementType="Argument">
+                  <stringProp name="Argument.name">kafka_ssl_keystore</stringProp>
+                  <stringProp name="Argument.value">${PARAMETER_KAFKA_SSL_KEYSTORE}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+                <elementProp name="kafka_ssl_keystore_password" elementType="Argument">
+                  <stringProp name="Argument.name">kafka_ssl_keystore_password</stringProp>
+                  <stringProp name="Argument.value">${PARAMETER_KAFKA_SSL_KEYSTORE_PASSWORD}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+                <elementProp name="kafka_ssl_truststore" elementType="Argument">
+                  <stringProp name="Argument.name">kafka_ssl_truststore</stringProp>
+                  <stringProp name="Argument.value">${PARAMETER_KAFKA_SSL_TRUSTSTORE}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+                <elementProp name="kafka_ssl_truststore_password" elementType="Argument">
+                  <stringProp name="Argument.name">kafka_ssl_truststore_password</stringProp>
+                  <stringProp name="Argument.value">${PARAMETER_KAFKA_SSL_TRUSTSTORE_PASSWORD}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+                <elementProp name="kafka_use_ssl" elementType="Argument">
+                  <stringProp name="Argument.name">kafka_use_ssl</stringProp>
+                  <stringProp name="Argument.value">${PARAMETER_KAFKA_USE_SSL}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+                <elementProp name="kafka_compression_type" elementType="Argument">
+                  <stringProp name="Argument.name">kafka_compression_type</stringProp>
+                  <stringProp name="Argument.value"></stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+                <elementProp name="kafka_partition" elementType="Argument">
+                  <stringProp name="Argument.name">kafka_partition</stringProp>
+                  <stringProp name="Argument.value"></stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+            <stringProp name="classname">co.signal.kafkameter.KafkaProducerSampler</stringProp>
+          </JavaSampler>
+          <hashTree/>
           <co.signal.loadgen.LoadGenerator guiclass="TestBeanGUI" testclass="co.signal.loadgen.LoadGenerator" testname="Load Generator Config" enabled="true">
             <stringProp name="className">SlopeGenerator</stringProp>
             <stringProp name="variableName">MESSAGE</stringProp>
             <stringProp name="variableTag">TAG</stringProp>
-            <stringProp name="variableSensorId">${__groovy(&quot;${__threadNum}&quot;.toInteger() + props.get(&quot;threadOffset&quot;).toInteger())}</stringProp>
+            <stringProp name="variableSensorId">${__threadNum}</stringProp>
           </co.signal.loadgen.LoadGenerator>
           <hashTree/>
           <ResultCollector guiclass="StatVisualizer" testclass="ResultCollector" testname="Report" enabled="true">
@@ -167,7 +215,7 @@ if (param == &quot;10.15.207.28&quot;) {
             <stringProp name="filename"></stringProp>
           </ResultCollector>
           <hashTree/>
-          <ResultCollector guiclass="TableVisualizer" testclass="ResultCollector" testname="View Results in Table" enabled="false">
+          <ResultCollector guiclass="TableVisualizer" testclass="ResultCollector" testname="View Results in Table" enabled="true">
             <boolProp name="ResultCollector.error_logging">false</boolProp>
             <objProp>
               <name>saveConfig</name>
@@ -204,7 +252,7 @@ if (param == &quot;10.15.207.28&quot;) {
             <stringProp name="filename"></stringProp>
           </ResultCollector>
           <hashTree/>
-          <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="false">
+          <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true">
             <boolProp name="ResultCollector.error_logging">false</boolProp>
             <objProp>
               <name>saveConfig</name>
@@ -242,10 +290,8 @@ if (param == &quot;10.15.207.28&quot;) {
           </ResultCollector>
           <hashTree/>
           <ConstantTimer guiclass="ConstantTimerGui" testclass="ConstantTimer" testname="Constant Timer" enabled="true">
-            <stringProp name="ConstantTimer.delay">0</stringProp>
+            <stringProp name="ConstantTimer.delay">100</stringProp>
           </ConstantTimer>
-          <hashTree/>
-          <net.xmeter.samplers.DisConnectSampler guiclass="net.xmeter.gui.DisConnectSamplerUI" testclass="net.xmeter.samplers.DisConnectSampler" testname="MQTT DisConnect" enabled="true"/>
           <hashTree/>
         </hashTree>
       </hashTree>
