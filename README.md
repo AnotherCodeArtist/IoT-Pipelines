@@ -131,6 +131,36 @@ This folder also includes the testplans (JMeter version 5.1.1) used for testing 
 
 ## Databases
 
+### InfluxDB
+1. Create Namespace influxdb
+2. Install the helm chart (https://github.com/helm/charts/tree/master/stable/influxdb) and use the namespace
+3. Open InfluxDB Shell
+4. Create Databases
+
+### CrateDB
+(1-7 like described in https://crate.io/a/run-your-first-cratedb-cluster-on-kubernetes-part-one/)
+
+1. Create Namespace crate
+2. Create `crate-internal-service.yaml`
+3. Apply it and create a service
+4. Create `crate-external-service.yaml`
+5. Apply it and create a service
+6. Create `crate-controller.yaml`
+7. Apply it and create the stateful set
+8. Install Crash (Shell for CrateDB)
+9. Create Databases
+
+### OpenTSDB
+1. Create Namespace opentsdb
+2. Create Secret
+3. Create Persistent Volume Claim `opentsdb-pc-claim.yaml`
+4. Apply PVC
+5. Create `opentsdb-deployment.yaml`
+6. Apply it in order to deploy OpenTSDB
+7. Create `opentsdb-service.yaml`
+8. Apply and create the service
+9. Create Databases
+
 ## MQTT
 
 ## Kafka
