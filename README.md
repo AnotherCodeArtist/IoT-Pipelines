@@ -42,6 +42,19 @@ the two remaining nodes are etcd nodes as well as worker nodes.
 
 ## Kafka
 
+In this folder all files necessary for the stream processing are stored. 
+
+- UsecaseExample is the whole Streamprocessing, its calculating diffrent things of the raw sensordata and creates a new stream in  new topic.
+- UsecaseGenProducer is a Producer which can be used during the developing time (instead of JMeter)
+- Serde: This is necessary for the serializing and deserializing of the stream (https://github.com/gwenshap/kafka-streams-stockstats/tree/master/src/main/java/com/shapira/examples/streams/stockstats/serde)
+- Models: in this directory are the POJOs defined and a own datatype CustomPair (Because Tuples or Triplets are immutable and not useful in our algorithm)
+- Namespace_kafka.json is to create a namespaces called kafka.
+- Streams-Deployment.yaml is the deployment of streams in a pod.
+- ConnectorInluxRaw.json is the KafkaConnect deployment useed for the raw sensordata to the InfluxDB.
+- ConnectorInflux.json is the KafkaConnect deployment used for the processed sensordata to the InfluxDB. 
+
+The Connector used is from https://docs.lenses.io/connectors/sink/influx.html.
+
 ## Databases
 
 ## ApacheFlink
@@ -100,3 +113,12 @@ This folder also includes the testplans (JMeter version 5.1.1) used for testing 
 ## MQTT
 
 ## Kafka
+
+1. Download Helmcharts(https://github.com/confluentinc/cp-helm-charts)
+2. Modify Helmcharts ( enable NodePorts etc.)
+3. Create Namespace
+4. Install Kafka with Helm 
+5. Create topics 
+6. Deploy connector for topics (Deployment for InfluxDB is necessary before this step)
+7. Start JMeter or Producer(for small first tries)
+8. Check topics
