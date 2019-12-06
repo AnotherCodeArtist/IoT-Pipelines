@@ -1,24 +1,38 @@
-# How to use Kafkastreams
+# First steps
+
+## Deployment of Kafka on K8s
+Download the helm carts. https://github.com/confluentinc/cp-helm-charts
+
+Direct to the cp-helm charts and install kafka.
+
+`helm install ./ --namespace kafka --name kafka01 -f values.yaml`
 
 ### Create the Topics
 Kafka Topics have to be created first as following.
 
-`bin/kafka-topics –-bootstrap-server <IP-address of Kafka Nodeport Service>:19092 --create --topic usecase-input --partitions 1 --replication-factor 1`
+`bin/kafka-topics –-bootstrap-server <IP-address of Kafka Nodeport Service>:19092 --create --topic usecase-input --partitions 4 --replication-factor 1`
 
-`bin/kafka-topics –-bootstrap-server <IP-address of Kafka Nodeport Service>:19092 --create --topic usecase-output --partitions 1 --replication-factor 1`
+`bin/kafka-topics –-bootstrap-server <IP-address of Kafka Nodeport Service>:19092 --create --topic usecaseOutputTrend --partitions 4 --replication-factor 1`
 
-`bin/kafka-topics –-bootstrap-server <IP-address of Kafka NodePort Service>:19092 --create --topic usecase-outputMax --partitions 1 --replication-factor 1`
+### Deploy Connectors
+It is important that the InfluxDB is deployed and the database is created before this step.
 
-### Build .jar File
-Direct into the directory.
+Connector to the Influxdatabase for the raw data.
 
-`mvn package`
+`curl -X POST -d @connectorInfluxRaw.json http://<ClusterIp of KafkaConnect SVC>:8083/connectors -H "Content-Type: application/json"`
 
-### Start UsecaseExample(Consumer)
 
-`java -cp target/uber-kafka-streams-usecase-1.0-SNAPSHOT.jar -DLOGLEVEL=INFO com.example.streams.usecase.UseCaseExample`
+Connector to the Influxdatabase for the processed data.
 
-### Start Producer
+`curl -X POST -d @connectorInflux.json http://<ClusterIp of KafkaConnect SVC>:8083/connectors -H "Content-Type: application/json"`
+
+### Start KafkaStreams
+Build a Container for streams.
+
+`kubectl apply -f deployment.yaml`
+
+
+### Start Producer (For Simulation < Use JMeter )
 Open a new terminal. Go in to the directory.
 
  `java -cp target/uber-kafka-streams-usecase-1.0-SNAPSHOT.jar -DLOGLEVEL=INFO com.example.streams.usecase.UseCaseGenProducer`
@@ -27,8 +41,4 @@ Open a new terminal. Go in to the directory.
 
 `bin/kafka-console-consumer --topic usecase-input --from-beginning --bootstrap-server <IP-address of Kafka NodePort Service>:19092 --property print.key=true`
 
-`bin/kafka-console-consumer --topic usecase-output --from-beginning --bootstrap-server <IP-address of Kafka NodePort Service>:19092 --property print.key=true`
-
-`bin/kafka-console-consumer --topic usecase-outputMax --from-beginning --bootstrap-server <IP-address of Kafka NodePort Service>:19092 --property print.key=true`
-
-(the property part is not nessesary)
+`bin/kafka-console-consumer --topic usecaseOutputTrend --from-beginning --bootstrap-server <IP-address of Kafka NodePort Service>:19092 --property print.key=true`
