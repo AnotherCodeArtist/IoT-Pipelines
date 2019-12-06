@@ -20,12 +20,33 @@ All members are responsible for the loadtesting.
 
 # Architecture
 
+This system uses two different sets of components for each pipeline.
+A common base is the Kubernetes infrastructure.
+
+For the first pipeline, apache kafka is used in combination with kafka streams in the following structure:
+
+* Apache kafka: Serves as Broker for incoming requests from clients.
+* Kafka Streams: Processes the incoming data.
+* Kafka Connect: Responsible for persisting data (raw sensor values as well as processed data) in an InfluxDB.
+
+For the second pipeline, RabbitMQ is used along with ApacheFlink in the following structure:
+
+* RabbitMQ: Serves as Broker for incoming requests from clients.
+* ApacheFlink: Processes the incoming data; also responsible for persisting data (raw sensor values as well as processed data) in an InfluxDB.
+
+The combination of ApacheFlink with Apache kafka is also implemented.
+
+The data stored inside the InfluxDB is visualized with Grafana.
+The overall goal is to compare the performance of these two pipelines.
+
+For testing, a fictional usecase was chosen. This usecase includes measurements of particulate matter within a city.  
+
 # Requirements
 
 * Debian 10.1 servers
 * external NFS server for centralized storage
-* SSDs are highly recommended
-** Apache Flink **
+* SSDs are highly recommended 
+* Apache Flink
 * Maven
 * Java
 * IntelliJ as IDE recommended
