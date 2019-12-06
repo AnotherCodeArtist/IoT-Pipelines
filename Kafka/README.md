@@ -32,7 +32,7 @@ Build a Container for streams.
 `kubectl apply -f deployment.yaml`
 
 
-### Start Producer (For Simulation < Use JMeter )
+### Start Producer ( Just for testings during development )
 Open a new terminal. Go in to the directory.
 
  `java -cp target/uber-kafka-streams-usecase-1.0-SNAPSHOT.jar -DLOGLEVEL=INFO com.example.streams.usecase.UseCaseGenProducer`
