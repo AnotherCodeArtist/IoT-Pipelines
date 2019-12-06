@@ -114,6 +114,8 @@ In this folder a fork of the https://github.com/BrightTag/kafkameter is stored. 
 
 This folder also includes the testplans (JMeter version 5.1.1) used for testing Kafka and MQTT.
 
+For the MQTT tests the [Jmeter MQTT plugin]: https://github.com/emqx/mqtt-jmeter has been used. Also the MQTT tests use kafkameter and the Java loadgenerating classes in the background. Therefor you also need these.
+
 # Setup
 
 ## Kubernetes
@@ -164,6 +166,21 @@ This folder also includes the testplans (JMeter version 5.1.1) used for testing 
 9. Create Databases
 
 ## MQTT
+
+1. Create namespace by using the provided '.yml' file
+2. Configure 'values.yml' file as you need
+2. Install the helm chart with 'helm install stable/rabbitmq-ha --name rmq-cluster -f .\rabbitmq-values_VX.yaml --namespace mqtt'
+
+## Apache Flink
+
+1. Use and Edit the provided '.yml' files from [here]: https://ci.apache.org/projects/flink/flink-docs-stable/ops/deployment/kubernetes.html.
+2. Create namespace with provided '.yml' file
+3. kubectl create -f flink-configuration-configmap.yml -n flink
+4. kubectl create -f jobmanager-service.yml -n flink
+5. kubectl create -f jobmanager-deployment.yml -n flink
+6. kubectl create -f taskmanager-deployment.yml -n flink
+7. kubectl create -f jobmanager-rest-service.yml -n flink
+
 
 ## Kafka
 
