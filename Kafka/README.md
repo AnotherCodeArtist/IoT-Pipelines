@@ -29,7 +29,7 @@ Connector to the Influxdatabase for the processed data.
 ### Start KafkaStreams
 Build a Container for streams.
 
-`kubectl apply -f deployment.yaml`
+`kubectl apply -f streams_deployment.yaml`
 
 
 ### Start Producer ( Just for testings during development )
