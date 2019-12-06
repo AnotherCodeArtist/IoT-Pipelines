@@ -78,7 +78,7 @@ public class UseCaseGenProducer {
 
                 // Note that we are using ticker as the key - so all asks for same stock will be in same partition
 
-                ProducerRecord<String, Usecase> record = new ProducerRecord<>("usecase-input3",sensorId, usecase);
+                ProducerRecord<String, Usecase> record = new ProducerRecord<>("usecase-input",sensorId, usecase);
 
 
 
