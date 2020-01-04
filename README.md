@@ -59,7 +59,7 @@ In this folder all necessary files for recreating the Kubernetes cluster are sto
 
 * The Ansible Playbook for installing the prerequisites
 * An example cluster.yml used for our implementation. This cluster utilizes three nodes, where the first one is a controlplane and etcd node.
-the two remaining nodes are etcd nodes as well as worker nodes.
+  the two remaining nodes are etcd nodes as well as worker nodes.
 
 ## Kafka
 
@@ -136,12 +136,14 @@ For the MQTT tests the [Jmeter MQTT plugin]: https://github.com/emqx/mqtt-jmeter
 ## Databases
 
 ### InfluxDB
+
 1. Create Namespace influxdb
 2. Install the helm chart (https://github.com/helm/charts/tree/master/stable/influxdb) and use the namespace
 3. Open InfluxDB Shell
 4. Create Databases
 
 ### CrateDB
+
 (1-7 like described in https://crate.io/a/run-your-first-cratedb-cluster-on-kubernetes-part-one/)
 
 1. Create Namespace crate
@@ -155,6 +157,7 @@ For the MQTT tests the [Jmeter MQTT plugin]: https://github.com/emqx/mqtt-jmeter
 9. Create Databases
 
 ### OpenTSDB
+
 1. Create Namespace opentsdb
 2. Create Secret
 3. Create Persistent Volume Claim `opentsdb-pc-claim.yaml`
@@ -169,7 +172,7 @@ For the MQTT tests the [Jmeter MQTT plugin]: https://github.com/emqx/mqtt-jmeter
 
 1. Create namespace by using the provided '.yml' file
 2. Configure 'values.yml' file as you need
-2. Install the helm chart with 'helm install stable/rabbitmq-ha --name rmq-cluster -f .\rabbitmq-values_VX.yaml --namespace mqtt'
+3. Install the helm chart with 'helm install stable/rabbitmq-ha --name rmq-cluster -f .\rabbitmq-values_VX.yaml --namespace mqtt'
 
 ## Apache Flink
 
@@ -192,3 +195,108 @@ For the MQTT tests the [Jmeter MQTT plugin]: https://github.com/emqx/mqtt-jmeter
 6. Deploy connector for topics (Deployment for InfluxDB is necessary before this step)
 7. Start JMeter or Producer(for small first tries)
 8. Check topics
+
+------
+
+## Grafana
+
+1. Download values.yaml from stable/grafana
+
+2. Change type of the service to NodePort:
+
+   ```yaml
+   service:
+     type: NodePort
+     port: 80
+     targetPort: 3000
+   ```
+
+3. Change image section to the following:
+
+   ```yaml
+   image:
+     repository: gzei/grafanatest
+     tag: latest
+     pullPolicy: Always
+   ```
+
+4. Change persistence to the following:
+
+   ```yaml
+   persistence:
+       type: pvc
+       enabled: true
+       storageClassName: nfs-client
+       accessModes:
+         - ReadWriteOnce
+       size: 8Gi
+   ```
+
+5. Set initChownData to false
+
+   ```yaml
+   initChownData:
+     enabled: false
+   ```
+
+6. Set adminUser and adminPassword to default credentials
+
+   ```yaml
+   adminUser: admin
+   adminPassword: [default_pw]
+   ```
+
+7. Set plugin path of grafana.ini to /var/lib/plugins
+
+   ```yaml
+   grafana.ini:
+     paths:
+       data: /var/lib/grafana/data
+       logs: /var/log/grafana
+       plugins: /var/lib/plugins
+       provisioning: /etc/grafana/provisioning
+   ```
+
+8. Install Grafana with the following command:
+   (assuming the customized values.yaml file exists in the current working directory)
+
+   ```
+   helm install stable/grafana -f values.yaml --name grafana --namespace grafana
+   ```
+
+9. Access Grafana GUI on 172.17.100.51:XXXXX
+
+10. Add necessary Data Sources:
+
+    1. InfluxDB (database: kafka)
+    2. InfluxDB (database: mqtt)
+
+11. Add new dashboard and create new panel
+
+12. In Visualization choose "Sensor Map" 
+
+13. Add two queries like this:
+
+    1. ```mysql
+       FROM 		default 		SensorData 	WHERE +
+       SELECT		field(id) +
+       		field(avgPM2) +
+       		field(lat) +
+       		field(long) +
+       GROUP BY 	+
+       FORMAT AS 	Table
+       ```
+
+    2. ```mysql
+       FROM 		default 		SensorAreas 	WHERE +
+       SELECT 		field(tooHigh) +
+       GROUP BY 	tag(area) +
+       FORMAT AS 	Table
+       ```
+
+14. While inside the dashboard, change the time range in the top right corner to the value of your choice.
+
+    Hints:
+
+    1. *Test data can not be read by the plugin if the timestamps of all existing points in the used database are out of range!*
+    2. *The gui needs a browser refresh to read the correct data after the time range has been changed!*
