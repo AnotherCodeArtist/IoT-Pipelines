@@ -1,0 +1,22 @@
+{
+  "type": "panel",
+  "name": "Sensor Map",
+  "id": "SensorMapPlugin",
+  "info": {
+    "description": "A map displaying sensors with threshold visualisation",
+    "author": {
+      "name": "lachchri16",
+      "url": "fh-joanneum.at"
+    },
+    "keywords": [ ],
+    "logos": { },
+    "links": [ ],
+    "screenshots": [ ],
+    "version": "1.0.0",
+    "updated": "2020.01.03"
+  },
+  "dependencies": {
+    "grafanaVersion": "6.x",
+    "plugins": [ ]
+  }
+}

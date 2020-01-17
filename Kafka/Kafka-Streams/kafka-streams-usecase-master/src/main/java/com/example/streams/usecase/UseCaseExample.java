@@ -12,6 +12,11 @@ import org.apache.kafka.streams.kstream.*;
 import org.apache.kafka.streams.state.WindowStore;
 import com.example.streams.usecase.serde.*;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.time.Duration;
@@ -26,16 +31,19 @@ public class UseCaseExample {
         JsonDeserializer<Usecase> usecaseDeserializer = new JsonDeserializer<>();
         Properties props = new Properties();
 
+        String botKey = "";
+        String chatId = "";
+
         int timeSpan = 10000;
 
         props.put(StreamsConfig.APPLICATION_ID_CONFIG, "usecase");
         props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "172.17.100.51:31090");
         props.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass().getName());
         props.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, UsecaseSerde.class.getName());
-       props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,"com.example.streams.usecase.serde.JsonDeserializer");
-       props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,"com.example.streams.usecase.serde.JsonDeserializer");
-       props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-       props.put("value.deserializer", usecaseDeserializer.getClass().getName());
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,"com.example.streams.usecase.serde.JsonDeserializer");
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,"com.example.streams.usecase.serde.JsonDeserializer");
+        props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        props.put("value.deserializer", usecaseDeserializer.getClass().getName());
         props.put("auto.create.topics.enable", "true");
 
 
@@ -69,19 +77,22 @@ public class UseCaseExample {
                 .groupBy((key, value) -> value.getArea())
                 .count(Materialized.with(Serdes.String(),Serdes.Long()))
                 .toStream();
+        trend2.foreach((k,v) -> sendToTelegram("In " + k + "was registred a too high Pm2.5 concentration" +v.toString() , chatId,botKey) );
+
         trend2.to("usecase-outputTrend2", Produced.with(Serdes.String(), Serdes.Long()));
+
 
 
 
         Topology topology = builder.build();
         KafkaStreams streams = new KafkaStreams(topology, props);
-            streams.cleanUp();
-            streams.start();
+        streams.cleanUp();
+        streams.start();
         Runtime.getRuntime().addShutdownHook(new Thread(streams::close));
-      }
+    }
 
 
-   //Serde for POJO Usecase
+    //Serde for POJO Usecase
     static public final class UsecaseSerde extends WrapperSerde<Usecase> {
         public UsecaseSerde() {
             super(new JsonSerializer<Usecase>(), new JsonDeserializer<Usecase>(Usecase.class));
@@ -98,5 +109,17 @@ public class UseCaseExample {
 
     }
 
+    public static void sendToTelegram(String message, String chatId, String apiToken) {
 
+        String urlString = "https://api.telegram.org/bot%s/sendMessage?chat_id=%s&text=%s";
+        urlString = String.format(urlString, apiToken, chatId, message);
+
+        try {
+            URL url = new URL(urlString);
+            URLConnection conn = url.openConnection();
+            InputStream is = new BufferedInputStream(conn.getInputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

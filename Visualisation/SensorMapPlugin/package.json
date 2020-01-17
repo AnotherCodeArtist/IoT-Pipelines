@@ -1,0 +1,38 @@
+{
+  "name": "grafana-panel-template-react-ts-webpack",
+  "version": "1.0.0",
+  "description": "Some description",
+  "main": "dist/module.js",
+  "scripts": {
+    "build": "webpack --config build/webpack.prod.conf.js",
+    "dev": "webpack --config build/webpack.dev.conf.js"
+  },
+  "keywords": [],
+  "author": "CorpGlory",
+  "repository": "https://github.com/CorpGlory/grafana-panel-template-react-ts-webpack",
+  "devDependencies": {
+    "@grafana/data": "latest",
+    "@grafana/ui": "latest",
+    "@types/grafana": "github:CorpGlory/types-grafana",
+    "@types/lodash": "^4.14.74",
+    "@types/react": "^16.0.25",
+    "@types/react-dom": "^16.9.0",
+    "copy-webpack-plugin": "^4.5.1",
+    "css-loader": "^3.2.0",
+    "extract-text-webpack-plugin": "^4.0.0-beta.0",
+    "image-webpack-loader": "^6.0.0",
+    "node-sass": "^4.12.0",
+    "replace-in-file-webpack-plugin": "^1.0.6",
+    "sass-loader": "^7.3.1",
+    "style-loader": "^1.0.0",
+    "ts-loader": "^4.4.0",
+    "typescript": "^2.9.1",
+    "webpack": "^4.12.0",
+    "webpack-cli": "^3.0.3"
+  },
+  "dependencies": {
+    "@grafana/data": "^6.3.2",
+    "leaflet-defaulticon-compatibility": "^0.1.1",
+    "leaflet": "latest"
+  }
+}

@@ -48,9 +48,9 @@ livenessProbe:
 # schedulerName: "default-scheduler"
 
 image:
-  repository: grafana/grafana
-  tag: 6.4.2
-  pullPolicy: IfNotPresent
+  repository: gzei/grafanatest
+  tag: latest
+  pullPolicy: Always
 
   ## Optionally specify an array of imagePullSecrets.
   ## Secrets must be manually created in the namespace.
@@ -223,7 +223,7 @@ initChownData:
 
 # Administrator credentials when not using an existing secret (see below)
 adminUser: admin
-adminPassword: strongpassword
+adminPassword: Pa55w.rd
 
 # Use an existing secret for the admin user.
 # admin:
@@ -363,7 +363,7 @@ grafana.ini:
   paths:
     data: /var/lib/grafana/data
     logs: /var/log/grafana
-    plugins: /var/lib/grafana/plugins
+    plugins: /var/lib/plugins
     provisioning: /etc/grafana/provisioning
   analytics:
     check_for_updates: true
