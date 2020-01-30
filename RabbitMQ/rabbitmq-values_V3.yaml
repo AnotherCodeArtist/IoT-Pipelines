@@ -127,7 +127,7 @@ rabbitmqVhost: "/"
 ## RabbitMQ Memory high watermark
 ## Ref: http://www.rabbitmq.com/memory.html
 ##
-rabbitmqMemoryHighWatermark: 2048MB
+rabbitmqMemoryHighWatermark: 6144MB
 rabbitmqMemoryHighWatermarkType: absolute
 
 ## EPMD port for peer discovery service used by RabbitMQ nodes and CLI tools
