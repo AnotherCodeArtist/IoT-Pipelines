@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jmeterTestPlan version="1.2" properties="5.0" jmeter="5.1.1 r1855137">
   <hashTree>
-    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="MQTT_LoadGenerator" enabled="true">
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Test Plan" enabled="true">
       <stringProp name="TestPlan.comments"></stringProp>
       <boolProp name="TestPlan.functional_mode">false</boolProp>
       <boolProp name="TestPlan.tearDown_on_shutdown">true</boolProp>
@@ -12,17 +12,18 @@
       <stringProp name="TestPlan.user_define_classpath"></stringProp>
     </TestPlan>
     <hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Detection Loadgenerator RabbitMQ" enabled="true">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group Distributed" enabled="true">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <intProp name="LoopController.loops">-1</intProp>
         </elementProp>
         <stringProp name="ThreadGroup.num_threads">2000</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">180</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">300</stringProp>
         <boolProp name="ThreadGroup.scheduler">true</boolProp>
-        <stringProp name="ThreadGroup.duration">300</stringProp>
+        <stringProp name="ThreadGroup.duration">900</stringProp>
         <stringProp name="ThreadGroup.delay"></stringProp>
+        <boolProp name="ThreadGroup.delayedStart">true</boolProp>
       </ThreadGroup>
       <hashTree>
         <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="Transaction Controller" enabled="true">
@@ -30,9 +31,75 @@
           <boolProp name="TransactionController.parent">false</boolProp>
         </TransactionController>
         <hashTree>
-          <net.xmeter.samplers.ConnectSampler guiclass="net.xmeter.gui.ConnectSamplerUI" testclass="net.xmeter.samplers.ConnectSampler" testname="Connect_RabbitMQ" enabled="true">
+          <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="JSR223 Sampler" enabled="true">
+            <stringProp name="cacheKey">true</stringProp>
+            <stringProp name="filename"></stringProp>
+            <stringProp name="parameters"></stringProp>
+            <stringProp name="script">String param = &quot;${__machineIP}&quot;;
+props.put(&quot;threadOffset&quot;, Integer.toString(0)); 
+if (param == &quot;10.15.206.107&quot;) {    
+	props.put(&quot;threadOffset&quot;, Integer.toString(0)); 
+	log.info props.get(&quot;threadOffset&quot;);
+} else if(param == &quot;10.15.206.89&quot;){    
+    props.put(&quot;threadOffset&quot;, Integer.toString(2000)); 
+    }
+    else if(param == &quot;10.15.207.125&quot;){    
+    props.put(&quot;threadOffset&quot;, Integer.toString(4000)); 
+    }
+    else if(param == &quot;10.15.207.176&quot;){    
+    props.put(&quot;threadOffset&quot;, Integer.toString(6000)); 
+    }
+    else if(param == &quot;10.15.207.159&quot;){    
+    props.put(&quot;threadOffset&quot;, Integer.toString(8000)); 
+    }
+     else if(param == &quot;10.15.207.58&quot;){    
+    props.put(&quot;threadOffset&quot;, Integer.toString(10000)); 
+    }
+     else if(param == &quot;10.15.207.139&quot;){    
+    props.put(&quot;threadOffset&quot;, Integer.toString(12000)); 
+    }
+    else if(param == &quot;10.15.207.57&quot;){    
+    props.put(&quot;threadOffset&quot;, Integer.toString(14000)); 
+    }
+    else if(param == &quot;10.15.204.149&quot;){    
+    props.put(&quot;threadOffset&quot;, Integer.toString(16000)); 
+    }
+    else if(param == &quot;10.15.204.150&quot;){    
+    props.put(&quot;threadOffset&quot;, Integer.toString(18000)); 
+    }
+    else if(param == &quot;10.15.206.247&quot;){    
+    props.put(&quot;threadOffset&quot;, Integer.toString(20000)); 
+    }
+    else if(param == &quot;10.15.207.165&quot;){    
+    props.put(&quot;threadOffset&quot;, Integer.toString(22000)); 
+    }
+    else if(param == &quot;10.15.206.204&quot;){    
+    props.put(&quot;threadOffset&quot;, Integer.toString(24000)); 
+    }
+    else if(param == &quot;10.15.205.196&quot;){    
+    props.put(&quot;threadOffset&quot;, Integer.toString(26000)); 
+    }
+    else if(param == &quot;10.15.206.163&quot;){    
+    props.put(&quot;threadOffset&quot;, Integer.toString(28000)); 
+    }
+    else if(param == &quot;10.15.204.169&quot;){    
+    props.put(&quot;threadOffset&quot;, Integer.toString(30000)); 
+    }
+    else if(param == &quot;10.15.207.113&quot;){    
+    props.put(&quot;threadOffset&quot;, Integer.toString(32000)); 
+    }
+    else if(param == &quot;10.15.204.146&quot;){    
+    props.put(&quot;threadOffset&quot;, Integer.toString(34000)); 
+    }
+    else if(param == &quot;10.15.207.164&quot;){    
+    props.put(&quot;threadOffset&quot;, Integer.toString(36000)); 
+    }</stringProp>
+            <stringProp name="scriptLanguage">groovy</stringProp>
+          </JSR223Sampler>
+          <hashTree/>
+          <net.xmeter.samplers.ConnectSampler guiclass="net.xmeter.gui.ConnectSamplerUI" testclass="net.xmeter.samplers.ConnectSampler" testname="MQTT Connect" enabled="true">
             <stringProp name="mqtt.server">172.17.100.55</stringProp>
-            <stringProp name="mqtt.port">32750</stringProp>
+            <stringProp name="mqtt.port">32684</stringProp>
             <stringProp name="mqtt.version">3.1.1</stringProp>
             <stringProp name="mqtt.conn_timeout">10</stringProp>
             <stringProp name="mqtt.protocol">TCP</stringProp>
@@ -43,31 +110,32 @@
             <stringProp name="mqtt.clientcert_password"></stringProp>
             <stringProp name="mqtt.user_name">guest</stringProp>
             <stringProp name="mqtt.password">Pa55w.rd</stringProp>
-            <stringProp name="mqtt.client_id_prefix"></stringProp>
+            <stringProp name="mqtt.client_id_prefix">conn_</stringProp>
             <boolProp name="mqtt.client_id_suffix">true</boolProp>
-            <stringProp name="mqtt.conn_keep_alive">300</stringProp>
+            <stringProp name="mqtt.conn_keep_alive">900</stringProp>
             <stringProp name="mqtt.conn_attampt_max">2</stringProp>
             <stringProp name="mqtt.reconn_attampt_max">2</stringProp>
             <boolProp name="mqtt.conn_clean_session">true</boolProp>
           </net.xmeter.samplers.ConnectSampler>
           <hashTree/>
-          <net.xmeter.samplers.PubSampler guiclass="net.xmeter.gui.PubSamplerUI" testclass="net.xmeter.samplers.PubSampler" testname="Send_Sensor_Data" enabled="true">
-            <stringProp name="mqtt.topic_name">graz/sensors/mqtt/pm2/grafana</stringProp>
+          <net.xmeter.samplers.PubSampler guiclass="net.xmeter.gui.PubSamplerUI" testclass="net.xmeter.samplers.PubSampler" testname="MQTT Pub Sampler" enabled="true">
+            <stringProp name="mqtt.topic_name">graz/sensors/mqtt/pm2/detection</stringProp>
             <stringProp name="mqtt.qos_level">0</stringProp>
             <boolProp name="mqtt.add_timestamp">false</boolProp>
             <stringProp name="mqtt.message_type">String</stringProp>
             <stringProp name="mqtt.message_type_fixed_length">1024</stringProp>
-            <stringProp name="mqtt.message_to_sent">${loadgen}</stringProp>
+            <stringProp name="mqtt.message_to_sent">${MESSAGE}</stringProp>
             <boolProp name="mqtt.retained_message">false</boolProp>
           </net.xmeter.samplers.PubSampler>
           <hashTree/>
           <co.signal.loadgen.LoadGenerator guiclass="TestBeanGUI" testclass="co.signal.loadgen.LoadGenerator" testname="Load Generator Config" enabled="true">
-            <stringProp name="className">LoadGenerator</stringProp>
-            <stringProp name="fileName"></stringProp>
-            <stringProp name="variableName">loadgen</stringProp>
+            <stringProp name="className">SlopeGenerator</stringProp>
+            <stringProp name="variableName">MESSAGE</stringProp>
+            <stringProp name="variableTag">TAG</stringProp>
+            <stringProp name="variableSensorId">${__groovy(&quot;${__threadNum}&quot;.toInteger() + props.get(&quot;threadOffset&quot;).toInteger())}</stringProp>
           </co.signal.loadgen.LoadGenerator>
           <hashTree/>
-          <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report" enabled="true">
+          <ResultCollector guiclass="StatVisualizer" testclass="ResultCollector" testname="Report" enabled="true">
             <boolProp name="ResultCollector.error_logging">false</boolProp>
             <objProp>
               <name>saveConfig</name>
@@ -141,7 +209,44 @@
             <stringProp name="filename"></stringProp>
           </ResultCollector>
           <hashTree/>
-          <ResultCollector guiclass="GraphVisualizer" testclass="ResultCollector" testname="Graph Results" enabled="false">
+          <ResultCollector guiclass="TableVisualizer" testclass="ResultCollector" testname="View Results in Table" enabled="true">
+            <boolProp name="ResultCollector.error_logging">false</boolProp>
+            <objProp>
+              <name>saveConfig</name>
+              <value class="SampleSaveConfiguration">
+                <time>true</time>
+                <latency>true</latency>
+                <timestamp>true</timestamp>
+                <success>true</success>
+                <label>true</label>
+                <code>true</code>
+                <message>true</message>
+                <threadName>true</threadName>
+                <dataType>true</dataType>
+                <encoding>false</encoding>
+                <assertions>true</assertions>
+                <subresults>true</subresults>
+                <responseData>false</responseData>
+                <samplerData>false</samplerData>
+                <xml>false</xml>
+                <fieldNames>true</fieldNames>
+                <responseHeaders>false</responseHeaders>
+                <requestHeaders>false</requestHeaders>
+                <responseDataOnError>false</responseDataOnError>
+                <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+                <assertionsResultsToSave>0</assertionsResultsToSave>
+                <bytes>true</bytes>
+                <sentBytes>true</sentBytes>
+                <url>true</url>
+                <threadCounts>true</threadCounts>
+                <idleTime>true</idleTime>
+                <connectTime>true</connectTime>
+              </value>
+            </objProp>
+            <stringProp name="filename"></stringProp>
+          </ResultCollector>
+          <hashTree/>
+          <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="false">
             <boolProp name="ResultCollector.error_logging">false</boolProp>
             <objProp>
               <name>saveConfig</name>
@@ -183,22 +288,23 @@
           </ConstantTimer>
           <hashTree/>
           <net.xmeter.samplers.DisConnectSampler guiclass="net.xmeter.gui.DisConnectSamplerUI" testclass="net.xmeter.samplers.DisConnectSampler" testname="MQTT DisConnect" enabled="false">
-            <stringProp name="TestPlan.comments">Should be turned off</stringProp>
+            <stringProp name="TestPlan.comments">Should be turned off </stringProp>
           </net.xmeter.samplers.DisConnectSampler>
           <hashTree/>
         </hashTree>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Detection Loadgenerator Mosquitto" enabled="true">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group Local" enabled="true">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <intProp name="LoopController.loops">-1</intProp>
         </elementProp>
         <stringProp name="ThreadGroup.num_threads">2000</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">60</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">300</stringProp>
         <boolProp name="ThreadGroup.scheduler">true</boolProp>
-        <stringProp name="ThreadGroup.duration">300</stringProp>
+        <stringProp name="ThreadGroup.duration">900</stringProp>
         <stringProp name="ThreadGroup.delay"></stringProp>
+        <boolProp name="ThreadGroup.delayedStart">true</boolProp>
       </ThreadGroup>
       <hashTree>
         <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="Transaction Controller" enabled="true">
@@ -206,9 +312,9 @@
           <boolProp name="TransactionController.parent">false</boolProp>
         </TransactionController>
         <hashTree>
-          <net.xmeter.samplers.ConnectSampler guiclass="net.xmeter.gui.ConnectSamplerUI" testclass="net.xmeter.samplers.ConnectSampler" testname="Connect_RabbitMQ" enabled="true">
+          <net.xmeter.samplers.ConnectSampler guiclass="net.xmeter.gui.ConnectSamplerUI" testclass="net.xmeter.samplers.ConnectSampler" testname="MQTT Connect" enabled="true">
             <stringProp name="mqtt.server">172.17.100.55</stringProp>
-            <stringProp name="mqtt.port">31857</stringProp>
+            <stringProp name="mqtt.port">32750</stringProp>
             <stringProp name="mqtt.version">3.1.1</stringProp>
             <stringProp name="mqtt.conn_timeout">10</stringProp>
             <stringProp name="mqtt.protocol">TCP</stringProp>
@@ -217,33 +323,34 @@
             <stringProp name="mqtt.keystore_password"></stringProp>
             <stringProp name="mqtt.clientcert_file_path"></stringProp>
             <stringProp name="mqtt.clientcert_password"></stringProp>
-            <stringProp name="mqtt.user_name"></stringProp>
-            <stringProp name="mqtt.password"></stringProp>
-            <stringProp name="mqtt.client_id_prefix"></stringProp>
+            <stringProp name="mqtt.user_name">guest</stringProp>
+            <stringProp name="mqtt.password">Pa55w.rd</stringProp>
+            <stringProp name="mqtt.client_id_prefix">conn_</stringProp>
             <boolProp name="mqtt.client_id_suffix">true</boolProp>
-            <stringProp name="mqtt.conn_keep_alive">300</stringProp>
+            <stringProp name="mqtt.conn_keep_alive">900</stringProp>
             <stringProp name="mqtt.conn_attampt_max">2</stringProp>
             <stringProp name="mqtt.reconn_attampt_max">2</stringProp>
             <boolProp name="mqtt.conn_clean_session">true</boolProp>
           </net.xmeter.samplers.ConnectSampler>
           <hashTree/>
-          <net.xmeter.samplers.PubSampler guiclass="net.xmeter.gui.PubSamplerUI" testclass="net.xmeter.samplers.PubSampler" testname="Send_Sensor_Data" enabled="true">
-            <stringProp name="mqtt.topic_name">test/mos</stringProp>
+          <net.xmeter.samplers.PubSampler guiclass="net.xmeter.gui.PubSamplerUI" testclass="net.xmeter.samplers.PubSampler" testname="MQTT Pub Sampler" enabled="true">
+            <stringProp name="mqtt.topic_name">graz/sensors/mqtt/pm2/grafana</stringProp>
             <stringProp name="mqtt.qos_level">0</stringProp>
             <boolProp name="mqtt.add_timestamp">false</boolProp>
             <stringProp name="mqtt.message_type">String</stringProp>
             <stringProp name="mqtt.message_type_fixed_length">1024</stringProp>
-            <stringProp name="mqtt.message_to_sent">${loadgen}</stringProp>
+            <stringProp name="mqtt.message_to_sent">${MESSAGE}</stringProp>
             <boolProp name="mqtt.retained_message">false</boolProp>
           </net.xmeter.samplers.PubSampler>
           <hashTree/>
           <co.signal.loadgen.LoadGenerator guiclass="TestBeanGUI" testclass="co.signal.loadgen.LoadGenerator" testname="Load Generator Config" enabled="true">
-            <stringProp name="className">LoadGenerator</stringProp>
-            <stringProp name="fileName"></stringProp>
-            <stringProp name="variableName">loadgen</stringProp>
+            <stringProp name="className">SlopeGenerator</stringProp>
+            <stringProp name="variableName">MESSAGE</stringProp>
+            <stringProp name="variableTag">TAG</stringProp>
+            <intProp name="variableSensorId">0</intProp>
           </co.signal.loadgen.LoadGenerator>
           <hashTree/>
-          <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report" enabled="true">
+          <ResultCollector guiclass="StatVisualizer" testclass="ResultCollector" testname="Report" enabled="true">
             <boolProp name="ResultCollector.error_logging">false</boolProp>
             <objProp>
               <name>saveConfig</name>
@@ -317,7 +424,44 @@
             <stringProp name="filename"></stringProp>
           </ResultCollector>
           <hashTree/>
-          <ResultCollector guiclass="GraphVisualizer" testclass="ResultCollector" testname="Graph Results" enabled="false">
+          <ResultCollector guiclass="TableVisualizer" testclass="ResultCollector" testname="View Results in Table" enabled="true">
+            <boolProp name="ResultCollector.error_logging">false</boolProp>
+            <objProp>
+              <name>saveConfig</name>
+              <value class="SampleSaveConfiguration">
+                <time>true</time>
+                <latency>true</latency>
+                <timestamp>true</timestamp>
+                <success>true</success>
+                <label>true</label>
+                <code>true</code>
+                <message>true</message>
+                <threadName>true</threadName>
+                <dataType>true</dataType>
+                <encoding>false</encoding>
+                <assertions>true</assertions>
+                <subresults>true</subresults>
+                <responseData>false</responseData>
+                <samplerData>false</samplerData>
+                <xml>false</xml>
+                <fieldNames>true</fieldNames>
+                <responseHeaders>false</responseHeaders>
+                <requestHeaders>false</requestHeaders>
+                <responseDataOnError>false</responseDataOnError>
+                <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+                <assertionsResultsToSave>0</assertionsResultsToSave>
+                <bytes>true</bytes>
+                <sentBytes>true</sentBytes>
+                <url>true</url>
+                <threadCounts>true</threadCounts>
+                <idleTime>true</idleTime>
+                <connectTime>true</connectTime>
+              </value>
+            </objProp>
+            <stringProp name="filename"></stringProp>
+          </ResultCollector>
+          <hashTree/>
+          <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="false">
             <boolProp name="ResultCollector.error_logging">false</boolProp>
             <objProp>
               <name>saveConfig</name>
@@ -355,11 +499,11 @@
           </ResultCollector>
           <hashTree/>
           <ConstantTimer guiclass="ConstantTimerGui" testclass="ConstantTimer" testname="Constant Timer" enabled="true">
-            <stringProp name="ConstantTimer.delay">1000</stringProp>
+            <stringProp name="ConstantTimer.delay">15000</stringProp>
           </ConstantTimer>
           <hashTree/>
           <net.xmeter.samplers.DisConnectSampler guiclass="net.xmeter.gui.DisConnectSamplerUI" testclass="net.xmeter.samplers.DisConnectSampler" testname="MQTT DisConnect" enabled="false">
-            <stringProp name="TestPlan.comments">Should be turned off</stringProp>
+            <stringProp name="TestPlan.comments">Should be turned off </stringProp>
           </net.xmeter.samplers.DisConnectSampler>
           <hashTree/>
         </hashTree>

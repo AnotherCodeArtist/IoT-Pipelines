@@ -245,7 +245,9 @@ if (param == &quot;10.15.207.28&quot;) {
             <stringProp name="ConstantTimer.delay">0</stringProp>
           </ConstantTimer>
           <hashTree/>
-          <net.xmeter.samplers.DisConnectSampler guiclass="net.xmeter.gui.DisConnectSamplerUI" testclass="net.xmeter.samplers.DisConnectSampler" testname="MQTT DisConnect" enabled="true"/>
+          <net.xmeter.samplers.DisConnectSampler guiclass="net.xmeter.gui.DisConnectSamplerUI" testclass="net.xmeter.samplers.DisConnectSampler" testname="MQTT DisConnect" enabled="false">
+            <stringProp name="TestPlan.comments">Should be turned off </stringProp>
+          </net.xmeter.samplers.DisConnectSampler>
           <hashTree/>
         </hashTree>
       </hashTree>
