@@ -299,8 +299,8 @@ if (param == &quot;10.15.206.107&quot;) {
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <intProp name="LoopController.loops">-1</intProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">2000</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">300</stringProp>
+        <stringProp name="ThreadGroup.num_threads">1369</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">120</stringProp>
         <boolProp name="ThreadGroup.scheduler">true</boolProp>
         <stringProp name="ThreadGroup.duration">900</stringProp>
         <stringProp name="ThreadGroup.delay"></stringProp>
@@ -347,7 +347,7 @@ if (param == &quot;10.15.206.107&quot;) {
             <stringProp name="className">SlopeGenerator</stringProp>
             <stringProp name="variableName">MESSAGE</stringProp>
             <stringProp name="variableTag">TAG</stringProp>
-            <intProp name="variableSensorId">0</intProp>
+            <stringProp name="variableSensorId">${__groovy(&quot;${__threadNum}&quot;.toInteger() )}</stringProp>
           </co.signal.loadgen.LoadGenerator>
           <hashTree/>
           <ResultCollector guiclass="StatVisualizer" testclass="ResultCollector" testname="Report" enabled="true">
@@ -499,7 +499,7 @@ if (param == &quot;10.15.206.107&quot;) {
           </ResultCollector>
           <hashTree/>
           <ConstantTimer guiclass="ConstantTimerGui" testclass="ConstantTimer" testname="Constant Timer" enabled="true">
-            <stringProp name="ConstantTimer.delay">15000</stringProp>
+            <stringProp name="ConstantTimer.delay">5000</stringProp>
           </ConstantTimer>
           <hashTree/>
           <net.xmeter.samplers.DisConnectSampler guiclass="net.xmeter.gui.DisConnectSamplerUI" testclass="net.xmeter.samplers.DisConnectSampler" testname="MQTT DisConnect" enabled="false">
