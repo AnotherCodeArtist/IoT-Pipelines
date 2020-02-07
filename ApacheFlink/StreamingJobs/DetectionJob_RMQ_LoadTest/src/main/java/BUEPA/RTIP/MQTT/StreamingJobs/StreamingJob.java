@@ -58,7 +58,6 @@ public class StreamingJob {
         conf.put("rmq-password", "PUT YOUR OWN CONFIG");
         conf.put("rmq-vhost", "PUT YOUR OWN CONFIG");
         conf.put("rmq-queuename", "PUT YOUR OWN CONFIG");
-
         conf.put("influx-hostname", "PUT YOUR OWN CONFIG");
         conf.put("influx-username", "PUT YOUR OWN CONFIG");
         conf.put("influx-password", "PUT YOUR OWN CONFIG");
